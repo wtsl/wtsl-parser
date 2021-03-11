@@ -1,4 +1,4 @@
-package org.wtt.parser;
+package org.wtst.parser;
 
 public class WtstContext {
 }

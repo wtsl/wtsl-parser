@@ -1,4 +1,4 @@
-package org.wtt.util;
+package org.wtst.util;
 
 import java.util.concurrent.Callable;
 

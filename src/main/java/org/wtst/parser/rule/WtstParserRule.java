@@ -1,15 +1,15 @@
-package org.wtt.parser.rule;
+package org.wtst.parser.rule;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import org.springframework.expression.Expression;
-import org.wtt.util.SpelUtils;
+import org.wtst.util.SpelUtils;
 
 import java.util.List;
 
 import static org.apache.commons.lang3.Validate.notEmpty;
-import static org.wtt.util.WtstUtils.notError;
+import static org.wtst.util.WtstUtils.notError;
 
 @Getter
 public class WtstParserRule {

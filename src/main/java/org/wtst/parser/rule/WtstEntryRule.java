@@ -1,11 +1,11 @@
-package org.wtt.parser.rule;
+package org.wtst.parser.rule;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.wtt.parser.WtstContext;
-import org.wtt.util.SpelUtils;
+import org.wtst.parser.WtstContext;
+import org.wtst.util.SpelUtils;
 
 import static org.apache.commons.lang3.Validate.notBlank;
 import static org.apache.commons.lang3.Validate.notNull;

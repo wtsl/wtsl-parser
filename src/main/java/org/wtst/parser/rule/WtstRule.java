@@ -1,4 +1,4 @@
-package org.wtt.parser.rule;
+package org.wtst.parser.rule;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
