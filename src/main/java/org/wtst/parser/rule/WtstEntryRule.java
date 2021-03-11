@@ -7,8 +7,8 @@ import org.springframework.expression.Expression;
 import org.wtst.parser.WtstContext;
 import org.wtst.util.SpelUtils;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.Validate.notBlank;
-import static org.apache.commons.lang3.Validate.notNull;
 
 public class WtstEntryRule {
 
@@ -24,8 +24,8 @@ public class WtstEntryRule {
                          @JsonProperty("alter") String alter) {
 
         this.name = notBlank(name, "entry rule must have non-blank name");
-        this.value = SpelUtils.parse(notNull(value, "entry rule must have 'value' rule"));
-        this.alter = SpelUtils.parse(alter);
+        this.value = SpelUtils.parse(notBlank(value, "entry rule must have 'value' rule"));
+        this.alter = SpelUtils.parse(defaultIfBlank(alter, "#value"));
     }
 
     public String getName() {
@@ -37,14 +37,10 @@ public class WtstEntryRule {
     }
 
     public Object getValue(EvaluationContext ctx, WtstContext obj) {
-        Object result = value.getValue(ctx, obj);
+        return value.getValue(ctx, obj);
+    }
 
-        if (alter != SpelUtils.EMPTY_EXP) {
-            ctx.setVariable("value", result);
-            result = alter.getValue(ctx, obj);
-            ctx.setVariable("value", null);
-        }
-
-        return result;
+    public Object getAlter(EvaluationContext ctx, WtstContext obj) {
+        return alter.getValue(ctx, obj);
     }
 }

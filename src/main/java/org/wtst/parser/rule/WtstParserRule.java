@@ -10,7 +10,7 @@ import org.wtst.util.SpelUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.Validate.notEmpty;
 
 public class WtstParserRule {
@@ -26,7 +26,7 @@ public class WtstParserRule {
                           @JsonProperty("readers") List<WtstReaderRule> readers,
                           @JsonProperty("mappers") List<WtstMapperRule> mappers) {
 
-        this.chapter = SpelUtils.parse(defaultString(chapter, "true"));
+        this.chapter = SpelUtils.parse(defaultIfBlank(chapter, "true"));
         this.readers = notEmpty(readers, "parser rule must have at least one reader rule");
         this.mappers = notEmpty(mappers, "parser rule must have at least one mapper rule");
     }
