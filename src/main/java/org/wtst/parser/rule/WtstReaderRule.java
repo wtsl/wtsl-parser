@@ -33,15 +33,15 @@ public class WtstReaderRule {
         this.take = notNull(take, "reader rule must have 'take' rule");
     }
 
-    public boolean getWhen(EvaluationContext ctx, WtstContext obj) {
+    public boolean isWhen(EvaluationContext ctx, WtstContext obj) {
         return Objects.equals(when.getValue(ctx, obj), Boolean.TRUE);
     }
 
-    public boolean getTill(EvaluationContext ctx, WtstContext obj) {
+    public boolean isTill(EvaluationContext ctx, WtstContext obj) {
         return !Objects.equals(till.getValue(ctx, obj), Boolean.FALSE);
     }
 
-    public boolean getSkip(EvaluationContext ctx, WtstContext obj) {
+    public boolean isSkip(EvaluationContext ctx, WtstContext obj) {
         return Objects.equals(skip.getValue(ctx, obj), Boolean.TRUE);
     }
 

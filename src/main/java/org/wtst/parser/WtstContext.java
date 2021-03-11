@@ -1,4 +1,4 @@
 package org.wtst.parser;
 
-public class WtstContext {
+public interface WtstContext {
 }
