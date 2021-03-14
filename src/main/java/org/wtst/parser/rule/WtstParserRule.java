@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.wtst.parser.WtstContext;
+import org.wtst.parser.WtstObject;
 import org.wtst.util.SpelUtils;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class WtstParserRule {
         this.mappers = notEmpty(mappers, "parser rule must have at least one mapper rule");
     }
 
-    public boolean isChapter(EvaluationContext ctx, WtstContext obj) {
-        return Objects.equals(chapter.getValue(ctx, obj), Boolean.TRUE);
+    public boolean isChapter(EvaluationContext context, WtstObject object) {
+        return Objects.equals(chapter.getValue(context, object), Boolean.TRUE);
     }
 
     public List<WtstReaderRule> getReaders() {

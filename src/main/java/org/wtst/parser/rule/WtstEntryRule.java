@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.wtst.parser.WtstContext;
+import org.wtst.parser.WtstObject;
 import org.wtst.util.SpelUtils;
 
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.Validate.notBlank;
 
 public class WtstEntryRule {
@@ -25,7 +25,7 @@ public class WtstEntryRule {
 
         this.name = notBlank(name, "entry rule must have non-blank name");
         this.value = SpelUtils.parse(notBlank(value, "entry rule must have 'value' rule"));
-        this.alter = SpelUtils.parse(defaultIfBlank(alter, "#value"));
+        this.alter = ofNullable(alter).map(SpelUtils::parse).orElse(null);
     }
 
     public String getName() {
@@ -36,11 +36,19 @@ public class WtstEntryRule {
         return getValue(SpelUtils.build(), null);
     }
 
-    public Object getValue(EvaluationContext ctx, WtstContext obj) {
-        return value.getValue(ctx, obj);
+    public Object getValue(EvaluationContext context, WtstObject object) {
+        return value.getValue(context, object);
     }
 
-    public Object getAlter(EvaluationContext ctx, WtstContext obj) {
-        return alter.getValue(ctx, obj);
+    public Object getAlter(EvaluationContext context, WtstObject object, Object value) {
+        if (alter == null) {
+            return value;
+        }
+
+        context.setVariable("value", value);
+        value = alter.getValue(context, object);
+        context.setVariable("value", null);
+
+        return value;
     }
 }

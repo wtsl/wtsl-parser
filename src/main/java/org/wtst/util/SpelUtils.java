@@ -11,11 +11,11 @@ import org.springframework.expression.spel.support.StandardTypeLocator;
 
 public class SpelUtils {
 
-    private static final ExpressionParser EXP_PARSER = new SpelExpressionParser
+    private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser
             (new SpelParserConfiguration(SpelCompilerMode.MIXED, null, true, true, Integer.MAX_VALUE));
 
-    public static Expression parse(String exp) {
-        return EXP_PARSER.parseExpression(exp);
+    public static Expression parse(String expression) {
+        return EXPRESSION_PARSER.parseExpression(expression);
     }
 
     public static EvaluationContext build() {

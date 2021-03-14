@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.wtst.parser.WtstContext;
+import org.wtst.parser.WtstObject;
 import org.wtst.util.SpelUtils;
 
 import java.util.Objects;
@@ -35,16 +35,16 @@ public class WtstReaderRule {
         this.take = notNull(take, "reader rule must have 'take' rule");
     }
 
-    public boolean isWhen(EvaluationContext ctx, WtstContext obj) {
-        return Objects.equals(when.getValue(ctx, obj), Boolean.TRUE);
+    public boolean isWhen(EvaluationContext context, WtstObject object) {
+        return Objects.equals(when.getValue(context, object), Boolean.TRUE);
     }
 
-    public boolean isTill(EvaluationContext ctx, WtstContext obj) {
-        return !Objects.equals(till.getValue(ctx, obj), Boolean.FALSE);
+    public boolean isTill(EvaluationContext context, WtstObject object) {
+        return !Objects.equals(till.getValue(context, object), Boolean.FALSE);
     }
 
-    public boolean isSkip(EvaluationContext ctx, WtstContext obj) {
-        return Objects.equals(skip.getValue(ctx, obj), Boolean.TRUE);
+    public boolean isSkip(EvaluationContext context, WtstObject object) {
+        return Objects.equals(skip.getValue(context, object), Boolean.TRUE);
     }
 
     public WtstEntryRule getTake() {

@@ -7,9 +7,9 @@ import java.util.Map;
 
 public interface WtstParser {
 
-    <T> T parse(Resource resource, WtstSchema schema, Map<String, ?> metadata, Class<T> type);
+    <T> T parse(Map<String, ?> metadata, WtstSchema schema, Resource resource, Class<T> type);
 
-    default <T> T parse(Resource resource, WtstSchema schema, Class<T> type) {
-        return parse(resource, schema, Collections.emptyMap(), type);
+    default <T> T parse(WtstSchema schema, Resource resource, Class<T> type) {
+        return parse(Collections.emptyMap(), schema, resource, type);
     }
 }
