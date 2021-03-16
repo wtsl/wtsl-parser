@@ -1,4 +1,4 @@
-package org.wtst.parser.excel;
+package org.wtst.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,5 +17,17 @@ public class WtstRowObject implements WtstObject {
         this.workbook = workbook;
         this.sheet = sheet;
         this.row = row;
+    }
+
+    public WtstCellObject cell(int index) {
+        return new WtstCellObject(workbook, sheet, row, row.getCell(index));
+    }
+
+    public WtstFontObject font(int index) {
+        return cell(index).font();
+    }
+
+    public Object value(int index) {
+        return cell(index).value();
     }
 }

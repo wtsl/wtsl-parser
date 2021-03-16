@@ -9,6 +9,8 @@ import org.springframework.expression.EvaluationContext;
 import org.wtst.parser.WtstObject;
 import org.wtst.parser.WtstParser;
 import org.wtst.parser.WtstSchema;
+import org.wtst.parser.excel.object.WtstRowObject;
+import org.wtst.parser.excel.object.WtstSheetObject;
 import org.wtst.parser.rule.WtstParserRule;
 import org.wtst.parser.rule.WtstReaderRule;
 import org.wtst.util.SpelUtils;
@@ -24,10 +26,10 @@ public class WtstExcelParser implements WtstParser {
 
     @Override
     public <T> T parse(Map<String, ?> metadata, WtstSchema schema, Resource resource, Class<T> type) {
-        Map<String, Object> values = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
 
         EvaluationContext context = SpelUtils.build();
-        context.setVariable("values", values);
+        context.setVariable("result", result);
         context.setVariable("entries", schema.getEntries());
         context.setVariable("metadata", metadata);
 
