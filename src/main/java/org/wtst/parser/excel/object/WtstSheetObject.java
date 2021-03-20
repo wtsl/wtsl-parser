@@ -2,9 +2,8 @@ package org.wtst.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.wtst.parser.WtstObject;
 
-public class WtstSheetObject implements WtstObject {
+public class WtstSheetObject {
 
     private final Workbook workbook;
 
@@ -15,7 +14,11 @@ public class WtstSheetObject implements WtstObject {
         this.sheet = sheet;
     }
 
+    public int index() {
+        return workbook == null ? -1 : workbook.getSheetIndex(sheet);
+    }
+
     public String name() {
-        return sheet.getSheetName();
+        return sheet == null ? null : sheet.getSheetName();
     }
 }

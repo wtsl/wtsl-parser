@@ -2,35 +2,49 @@ package org.wtst.parser;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.wtst.parser.rule.WtstEntryRule;
-import org.wtst.parser.rule.WtstParserRule;
+import org.springframework.expression.Expression;
+import org.wtst.util.SpelUtils;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static org.apache.commons.lang3.Validate.notEmpty;
-
 public class WtstSchema {
+
+    private final List<WtstReader> readers;
 
     private final Map<String, Object> entries;
 
-    private final List<WtstParserRule> parsers;
+    private final Map<String, Expression> writers;
 
     @JsonCreator
-    public WtstSchema(@JsonProperty("entries") List<WtstEntryRule> entries,
-                      @JsonProperty("parsers") List<WtstParserRule> parsers) {
+    public WtstSchema(@JsonProperty("readers") List<WtstReader> readers,
+                      @JsonProperty("entries") Map<String, String> entries,
+                      @JsonProperty("writers") Map<String, String> writers) {
 
-        this.entries = emptyIfNull(entries).stream().collect(toMap(WtstEntryRule::getName, WtstEntryRule::getValue));
-        this.parsers = notEmpty(parsers, "schema must have at least one parser rule");
+        this.readers = readers;
+
+        this.entries = new HashMap<>();
+        if (entries != null) {
+            entries.forEach((name, exp) -> this.entries.put(name, SpelUtils.parse(exp).getValue(SpelUtils.build())));
+        }
+
+        this.writers = new LinkedHashMap<>();
+        if (writers != null) {
+            writers.forEach((name, exp) -> this.writers.put(name, SpelUtils.parse(exp)));
+        }
+    }
+
+    public List<WtstReader> getReaders() {
+        return readers;
     }
 
     public Map<String, Object> getEntries() {
         return entries;
     }
 
-    public List<WtstParserRule> getParsers() {
-        return parsers;
+    public Map<String, Expression> getWriters() {
+        return writers;
     }
 }
