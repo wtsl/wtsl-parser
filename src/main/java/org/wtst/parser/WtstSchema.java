@@ -3,9 +3,7 @@ package org.wtst.parser;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.expression.Expression;
-import org.wtst.util.SpelUtils;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +23,14 @@ public class WtstSchema {
 
         this.readers = readers;
 
-        this.entries = new HashMap<>();
+        this.entries = new LinkedHashMap<>();
         if (entries != null) {
-            entries.forEach((name, exp) -> this.entries.put(name, SpelUtils.parse(exp).getValue(SpelUtils.build())));
+            entries.forEach((name, exp) -> this.entries.put(name, WtstUtils.parse(exp).getValue()));
         }
 
         this.writers = new LinkedHashMap<>();
         if (writers != null) {
-            writers.forEach((name, exp) -> this.writers.put(name, SpelUtils.parse(exp)));
+            writers.forEach((name, exp) -> this.writers.put(name, WtstUtils.parse(exp)));
         }
     }
 

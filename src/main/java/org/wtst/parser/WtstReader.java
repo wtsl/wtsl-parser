@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.wtst.util.SpelUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 public class WtstReader {
@@ -33,13 +31,13 @@ public class WtstReader {
 
         this.take = take;
 
-        this.when = SpelUtils.parse(when);
-        this.till = SpelUtils.parse(till);
-        this.skip = SpelUtils.parse(skip);
+        this.when = WtstUtils.parse(when);
+        this.till = WtstUtils.parse(till);
+        this.skip = WtstUtils.parse(skip);
 
         this.then = new LinkedHashMap<>();
         if (then != null) {
-            then.forEach((name, exp) -> this.then.put(name, SpelUtils.parse(exp)));
+            then.forEach((name, exp) -> this.then.put(name, WtstUtils.parse(exp)));
         }
     }
 
@@ -48,15 +46,15 @@ public class WtstReader {
     }
 
     public boolean isWhen(EvaluationContext context, WtstObject object) {
-        return Objects.equals(when.getValue(context, object), Boolean.TRUE);
+        return Boolean.TRUE.equals(when.getValue(context, object));
     }
 
     public boolean isTill(EvaluationContext context, WtstObject object) {
-        return !Objects.equals(till.getValue(context, object), Boolean.FALSE);
+        return !Boolean.FALSE.equals(till.getValue(context, object));
     }
 
     public boolean isSkip(EvaluationContext context, WtstObject object) {
-        return Objects.equals(skip.getValue(context, object), Boolean.TRUE);
+        return Boolean.TRUE.equals(skip.getValue(context, object));
     }
 
     public void doThen(EvaluationContext ctx, Object obj, Predicate<String> filter) {

@@ -6,11 +6,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.wtst.parser.WtstObject;
 import org.wtst.parser.excel.object.WtstCellObject;
 import org.wtst.parser.excel.object.WtstFontObject;
+import org.wtst.parser.excel.object.WtstRowObject;
 import org.wtst.parser.excel.object.WtstSheetObject;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Map;
 
 public class WtstExcelObject implements WtstObject {
 
@@ -21,6 +20,14 @@ public class WtstExcelObject implements WtstObject {
     private final Sheet sheet;
 
     private final Row row;
+
+    public WtstExcelObject(Map<String, ?> entries) {
+        this(entries, null);
+    }
+
+    public WtstExcelObject(Map<String, ?> entries, Workbook workbook) {
+        this(entries, workbook, null);
+    }
 
     public WtstExcelObject(Map<String, ?> entries, Workbook workbook, Sheet sheet) {
         this(entries, workbook, sheet, null);
@@ -34,43 +41,29 @@ public class WtstExcelObject implements WtstObject {
         this.row = row;
     }
 
-    public Map<String, ?> getEntries() {
-        return entries;
-    }
-
     public WtstSheetObject sheet() {
         return new WtstSheetObject(workbook, sheet);
     }
 
-    public WtstCellObject cell(int index) {
-        return new WtstCellObject(workbook, sheet, row, row == null ? null : row.getCell(index));
+    public WtstRowObject row() {
+        return new WtstRowObject(workbook, sheet, row);
     }
 
-    public WtstFontObject font(int index) {
-        return cell(index).font();
+    public WtstCellObject cell(int number) {
+        return new WtstCellObject(workbook, sheet, row, row == null ? null : row.getCell(number));
     }
 
-    public Object value(int index) {
-        return cell(index).value();
+    public WtstFontObject font(int number) {
+        return cell(number).font();
     }
 
-    public Stream<Object> stream(int... indexes) {
-        return Arrays.stream(indexes).mapToObj(this::value);
+    @Override
+    public Object value(int number) {
+        return cell(number).value();
     }
 
-    public Object[] array(int... indexes) {
-        return stream(indexes).toArray();
-    }
-
-    public List<Object> list(int... indexes) {
-        return stream(indexes).collect(Collectors.toCollection(LinkedList::new));
-    }
-
-    public Set<Object> set(int... indexes) {
-        return stream(indexes).collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    public int hash(int... indexes) {
-        return Arrays.hashCode(array(indexes));
+    @Override
+    public Map<String, ?> getEntries() {
+        return entries;
     }
 }

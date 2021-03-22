@@ -1,24 +1,24 @@
 package org.wtst.parser.excel.object;
 
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-public class WtstSheetObject {
+public class WtstRowObject {
 
     private final Workbook workbook;
 
     private final Sheet sheet;
 
-    public WtstSheetObject(Workbook workbook, Sheet sheet) {
+    private final Row row;
+
+    public WtstRowObject(Workbook workbook, Sheet sheet, Row row) {
         this.workbook = workbook;
         this.sheet = sheet;
+        this.row = row;
     }
 
     public int number() {
-        return workbook == null ? -1 : workbook.getSheetIndex(sheet) + 1;
-    }
-
-    public String name() {
-        return sheet == null ? null : sheet.getSheetName();
+        return row == null ? -1 : row.getRowNum() + 1;
     }
 }

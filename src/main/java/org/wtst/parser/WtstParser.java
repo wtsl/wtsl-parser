@@ -1,15 +1,15 @@
 package org.wtst.parser;
 
-import org.springframework.core.io.Resource;
-
+import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public interface WtstParser {
 
-    <T> T parse(Map<String, ?> metadata, WtstSchema schema, Resource resource, Class<T> type);
+    List<Map<String, Object>> parse(Map<String, Object> metadata, WtstSchema schema, InputStream stream);
 
-    default <T> T parse(WtstSchema schema, Resource resource, Class<T> type) {
-        return parse(Collections.emptyMap(), schema, resource, type);
+    default List<Map<String, Object>> parse(WtstSchema schema, InputStream stream) {
+        return parse(Collections.emptyMap(), schema, stream);
     }
 }

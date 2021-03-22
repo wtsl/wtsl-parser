@@ -1,10 +1,9 @@
 package org.wtst.parser.excel.object;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.wtst.util.ApoiUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 
 public class WtstCellObject {
 
@@ -24,10 +23,34 @@ public class WtstCellObject {
     }
 
     public WtstFontObject font() {
-        return new WtstFontObject(workbook, sheet, row, cell, ApoiUtils.getFont(workbook, cell));
+        if (cell instanceof XSSFCell) {
+            return new WtstFontObject(workbook, sheet, row, cell, ((XSSFCell) cell).getCellStyle().getFont());
+        }
+
+        if (cell instanceof HSSFCell && workbook instanceof HSSFWorkbook) {
+            return new WtstFontObject(workbook, sheet, row, cell, ((HSSFCell) cell).getCellStyle().getFont(workbook));
+        }
+
+        return new WtstFontObject(workbook, sheet, row, cell, null);
     }
 
     public Object value() {
-        return ApoiUtils.getValue(cell);
+        if (cell != null) {
+            switch (cell.getCellType()) {
+                case BLANK:
+                case STRING:
+                case FORMULA:
+                    return cell.getStringCellValue();
+                case NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        return cell.getLocalDateTimeCellValue();
+                    }
+                    return cell.getNumericCellValue();
+                case BOOLEAN:
+                    return cell.getBooleanCellValue();
+            }
+        }
+
+        return "";
     }
 }
