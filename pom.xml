@@ -11,7 +11,7 @@
 
     <name>WTSL Parser</name>
     <description>WTSL Parser</description>
-    <url>https://github.com/wk-v/wtsl</url>
+    <url>https://github.com/wk-v/wtsl-parser</url>
 
     <licenses>
         <license>
@@ -29,9 +29,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/wk-v/wtsl</connection>
-        <developerConnection>scm:git:git://github.com/wk-v/wtsl</developerConnection>
-        <url>https://github.com/wk-v/wtsl</url>
+        <connection>scm:git:git://github.com/wk-v/wtsl-parser</connection>
+        <developerConnection>scm:git:git://github.com/wk-v/wtsl-parser</developerConnection>
+        <url>https://github.com/wk-v/wtsl-parser</url>
     </scm>
 
     <dependencies>
