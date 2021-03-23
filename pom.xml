@@ -4,14 +4,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.wtst</groupId>
-    <artifactId>wtst-parser</artifactId>
+    <groupId>org.wtsl</groupId>
+    <artifactId>wtsl-parser</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>WTST Parser</name>
-    <description>WTST Parser</description>
-    <url>https://github.com/wk-v/wtst</url>
+    <name>WTSL Parser</name>
+    <description>WTSL Parser</description>
+    <url>https://github.com/wk-v/wtsl</url>
 
     <licenses>
         <license>
@@ -29,9 +29,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/wk-v/wtst</connection>
-        <developerConnection>scm:git:git://github.com/wk-v/wtst</developerConnection>
-        <url>https://github.com/wk-v/wtst</url>
+        <connection>scm:git:git://github.com/wk-v/wtsl</connection>
+        <developerConnection>scm:git:git://github.com/wk-v/wtsl</developerConnection>
+        <url>https://github.com/wk-v/wtsl</url>
     </scm>
 
     <dependencies>

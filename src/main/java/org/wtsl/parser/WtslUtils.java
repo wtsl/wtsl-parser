@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser;
+package org.wtsl.parser;
 
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstUtils {
+public class WtslUtils {
 
     private static final ExpressionParser EXP_PARSER = new SpelExpressionParser
             (new SpelParserConfiguration(SpelCompilerMode.MIXED, null, true, true, Integer.MAX_VALUE));

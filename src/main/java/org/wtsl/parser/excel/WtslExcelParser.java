@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.wtst.parser.excel;
+package org.wtsl.parser.excel;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.expression.Expression;
-import org.wtst.parser.*;
+import org.wtsl.parser.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,15 +33,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
-import static org.wtst.parser.WtstUtils.stream;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstExcelParser implements WtstParser {
+public class WtslExcelParser implements WtslParser {
 
     @Override
-    public List<Map<String, Object>> parse(Map<String, Object> metadata, WtstSchema schema, InputStream stream) {
+    public List<Map<String, Object>> parse(Map<String, Object> metadata, WtslSchema schema, InputStream stream) {
         Map<String, Object> entries = new LinkedHashMap<>(schema.getEntries());
 
         try (Workbook workbook = WorkbookFactory.create(stream)) {
@@ -52,16 +51,16 @@ public class WtstExcelParser implements WtstParser {
         }
     }
 
-    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtstReader> readers, Workbook workbook) {
+    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Workbook workbook) {
         if (readers == null || readers.isEmpty()) {
             return;
         }
 
         for (Sheet sheet : workbook) {
-            WtstContext ctx = new WtstContext(metadata);
-            WtstObject obj = new WtstExcelObject(entries, workbook, sheet);
+            WtslContext ctx = new WtslContext(metadata);
+            WtslObject obj = new WtslExcelObject(entries, workbook, sheet);
 
-            for (WtstReader reader : readers) {
+            for (WtslReader reader : readers) {
                 if (reader.isWhen(ctx, obj)) {
                     reader.doThen(ctx, obj, name -> true);
                     read(metadata, entries, reader.getTake(), workbook, sheet);
@@ -70,16 +69,16 @@ public class WtstExcelParser implements WtstParser {
         }
     }
 
-    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtstReader> readers, Workbook workbook, Sheet sheet) {
+    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Workbook workbook, Sheet sheet) {
         if (readers == null || readers.isEmpty()) {
             return;
         }
 
-        WtstReader reader = null;
-        WtstContext ctx = null;
+        WtslReader reader = null;
+        WtslContext ctx = null;
 
         for (Row row : sheet) {
-            WtstObject obj = new WtstExcelObject(entries, workbook, sheet, row);
+            WtslObject obj = new WtslExcelObject(entries, workbook, sheet, row);
 
             if (reader != null && reader.isTill(ctx, obj)) {
                 reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
@@ -87,9 +86,9 @@ public class WtstExcelParser implements WtstParser {
             }
 
             if (reader == null) {
-                ctx = new WtstContext(metadata);
+                ctx = new WtslContext(metadata);
 
-                for (WtstReader temp : readers) {
+                for (WtslReader temp : readers) {
                     if (temp.isWhen(ctx, obj)) {
                         reader = temp;
                         reader.doThen(ctx, obj, name -> name.charAt(name.length() - 1) == '$');
@@ -105,16 +104,16 @@ public class WtstExcelParser implements WtstParser {
     }
 
     private List<Map<String, Object>> write(Map<String, Object> metadata, Map<String, Object> entries, Map<String, Expression> writers) {
-        WtstObject obj = new WtstExcelObject(entries);
+        WtslObject obj = new WtslExcelObject(entries);
 
-        Stream<WtstContext> stream = Stream.of(new WtstContext(metadata));
+        Stream<WtslContext> stream = Stream.of(new WtslContext(metadata));
 
         for (Map.Entry<String, Expression> writer : writers.entrySet()) {
             final String name = writer.getKey();
             final Expression exp = writer.getValue();
 
             if (exp.getExpressionString().matches("^forEach\\([\\s\\S]+\\)$")) {
-                stream = stream.flatMap(ctx -> stream(exp.getValue(ctx, obj)).map(value -> ctx.next(name, value)));
+                stream = stream.flatMap(ctx -> WtslUtils.stream(exp.getValue(ctx, obj)).map(value -> ctx.next(name, value)));
             } else if (exp.getExpressionString().matches("^removeIf\\([\\s\\S]+\\)$")) {
                 stream = stream.filter(ctx -> !TRUE.equals(exp.getValue(ctx, obj))).map(ctx -> ctx.next(name, false));
             } else {
@@ -122,6 +121,6 @@ public class WtstExcelParser implements WtstParser {
             }
         }
 
-        return stream.map(WtstContext::getVariables).collect(Collectors.toList());
+        return stream.map(WtslContext::getVariables).collect(Collectors.toList());
     }
 }

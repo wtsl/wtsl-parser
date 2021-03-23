@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser;
+package org.wtsl.parser;
 
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -25,16 +25,16 @@ import java.util.Map;
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstContext extends StandardEvaluationContext {
+public class WtslContext extends StandardEvaluationContext {
 
     private final Map<String, Object> variables;
 
-    public WtstContext(Map<String, Object> variables) {
+    public WtslContext(Map<String, Object> variables) {
         this.variables = new LinkedHashMap<>(variables);
     }
 
-    public WtstContext next(String name, Object value) {
-        WtstContext context = new WtstContext(variables);
+    public WtslContext next(String name, Object value) {
+        WtslContext context = new WtslContext(variables);
         context.setVariable(name, value);
 
         return context;

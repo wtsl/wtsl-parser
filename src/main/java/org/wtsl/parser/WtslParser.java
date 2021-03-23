@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-package org.wtst.parser.excel.object;
+package org.wtsl.parser;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstRowObject {
+public interface WtslParser {
 
-    private final Workbook workbook;
+    List<Map<String, Object>> parse(Map<String, Object> metadata, WtslSchema schema, InputStream stream);
 
-    private final Sheet sheet;
-
-    private final Row row;
-
-    public WtstRowObject(Workbook workbook, Sheet sheet, Row row) {
-        this.workbook = workbook;
-        this.sheet = sheet;
-        this.row = row;
-    }
-
-    public int number() {
-        return row == null ? -1 : row.getRowNum() + 1;
+    default List<Map<String, Object>> parse(WtslSchema schema, InputStream stream) {
+        return parse(Collections.emptyMap(), schema, stream);
     }
 }

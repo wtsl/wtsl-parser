@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser;
+package org.wtsl.parser;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,16 +27,16 @@ import java.util.Map;
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstSchema {
+public class WtslSchema {
 
-    private final List<WtstReader> readers;
+    private final List<WtslReader> readers;
 
     private final Map<String, Object> entries;
 
     private final Map<String, Expression> writers;
 
     @JsonCreator
-    public WtstSchema(@JsonProperty("readers") List<WtstReader> readers,
+    public WtslSchema(@JsonProperty("readers") List<WtslReader> readers,
                       @JsonProperty("entries") Map<String, String> entries,
                       @JsonProperty("writers") Map<String, String> writers) {
 
@@ -44,16 +44,16 @@ public class WtstSchema {
 
         this.entries = new LinkedHashMap<>();
         if (entries != null) {
-            entries.forEach((name, exp) -> this.entries.put(name, WtstUtils.parse(exp).getValue()));
+            entries.forEach((name, exp) -> this.entries.put(name, WtslUtils.parse(exp).getValue()));
         }
 
         this.writers = new LinkedHashMap<>();
         if (writers != null) {
-            writers.forEach((name, exp) -> this.writers.put(name, WtstUtils.parse(exp)));
+            writers.forEach((name, exp) -> this.writers.put(name, WtslUtils.parse(exp)));
         }
     }
 
-    public List<WtstReader> getReaders() {
+    public List<WtslReader> getReaders() {
         return readers;
     }
 

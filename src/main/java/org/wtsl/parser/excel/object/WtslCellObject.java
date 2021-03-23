@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser.excel.object;
+package org.wtsl.parser.excel.object;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,7 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstCellObject {
+public class WtslCellObject {
 
     private final Workbook workbook;
 
@@ -34,23 +34,23 @@ public class WtstCellObject {
 
     private final Cell cell;
 
-    public WtstCellObject(Workbook workbook, Sheet sheet, Row row, Cell cell) {
+    public WtslCellObject(Workbook workbook, Sheet sheet, Row row, Cell cell) {
         this.workbook = workbook;
         this.sheet = sheet;
         this.row = row;
         this.cell = cell;
     }
 
-    public WtstFontObject font() {
+    public WtslFontObject font() {
         if (cell instanceof XSSFCell) {
-            return new WtstFontObject(workbook, sheet, row, cell, ((XSSFCell) cell).getCellStyle().getFont());
+            return new WtslFontObject(workbook, sheet, row, cell, ((XSSFCell) cell).getCellStyle().getFont());
         }
 
         if (cell instanceof HSSFCell && workbook instanceof HSSFWorkbook) {
-            return new WtstFontObject(workbook, sheet, row, cell, ((HSSFCell) cell).getCellStyle().getFont(workbook));
+            return new WtslFontObject(workbook, sheet, row, cell, ((HSSFCell) cell).getCellStyle().getFont(workbook));
         }
 
-        return new WtstFontObject(workbook, sheet, row, cell, null);
+        return new WtslFontObject(workbook, sheet, row, cell, null);
     }
 
     public Object value() {

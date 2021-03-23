@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package org.wtst.parser.excel;
+package org.wtsl.parser.excel;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.wtst.parser.WtstObject;
-import org.wtst.parser.excel.object.WtstCellObject;
-import org.wtst.parser.excel.object.WtstFontObject;
-import org.wtst.parser.excel.object.WtstRowObject;
-import org.wtst.parser.excel.object.WtstSheetObject;
+import org.wtsl.parser.WtslObject;
+import org.wtsl.parser.excel.object.WtslCellObject;
+import org.wtsl.parser.excel.object.WtslFontObject;
+import org.wtsl.parser.excel.object.WtslRowObject;
+import org.wtsl.parser.excel.object.WtslSheetObject;
 
 import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstExcelObject implements WtstObject {
+public class WtslExcelObject implements WtslObject {
 
     private final Map<String, ?> entries;
 
@@ -40,19 +40,19 @@ public class WtstExcelObject implements WtstObject {
 
     private final Row row;
 
-    public WtstExcelObject(Map<String, ?> entries) {
+    public WtslExcelObject(Map<String, ?> entries) {
         this(entries, null);
     }
 
-    public WtstExcelObject(Map<String, ?> entries, Workbook workbook) {
+    public WtslExcelObject(Map<String, ?> entries, Workbook workbook) {
         this(entries, workbook, null);
     }
 
-    public WtstExcelObject(Map<String, ?> entries, Workbook workbook, Sheet sheet) {
+    public WtslExcelObject(Map<String, ?> entries, Workbook workbook, Sheet sheet) {
         this(entries, workbook, sheet, null);
     }
 
-    public WtstExcelObject(Map<String, ?> entries, Workbook workbook, Sheet sheet, Row row) {
+    public WtslExcelObject(Map<String, ?> entries, Workbook workbook, Sheet sheet, Row row) {
         this.entries = entries;
 
         this.workbook = workbook;
@@ -60,19 +60,19 @@ public class WtstExcelObject implements WtstObject {
         this.row = row;
     }
 
-    public WtstSheetObject sheet() {
-        return new WtstSheetObject(workbook, sheet);
+    public WtslSheetObject sheet() {
+        return new WtslSheetObject(workbook, sheet);
     }
 
-    public WtstRowObject row() {
-        return new WtstRowObject(workbook, sheet, row);
+    public WtslRowObject row() {
+        return new WtslRowObject(workbook, sheet, row);
     }
 
-    public WtstCellObject cell(int number) {
-        return new WtstCellObject(workbook, sheet, row, row == null ? null : row.getCell(number));
+    public WtslCellObject cell(int number) {
+        return new WtslCellObject(workbook, sheet, row, row == null ? null : row.getCell(number));
     }
 
-    public WtstFontObject font(int number) {
+    public WtslFontObject font(int number) {
         return cell(number).font();
     }
 

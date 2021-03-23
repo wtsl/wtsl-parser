@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.wtst.parser.excel.object;
+package org.wtsl.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.*;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstFontObject {
+public class WtslFontObject {
 
     private final Workbook workbook;
 
@@ -33,7 +33,7 @@ public class WtstFontObject {
 
     private final Font font;
 
-    public WtstFontObject(Workbook workbook, Sheet sheet, Row row, Cell cell, Font font) {
+    public WtslFontObject(Workbook workbook, Sheet sheet, Row row, Cell cell, Font font) {
         this.workbook = workbook;
         this.sheet = sheet;
         this.row = row;

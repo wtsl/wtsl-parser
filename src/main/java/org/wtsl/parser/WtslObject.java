@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser;
+package org.wtsl.parser;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 /**
  * @author Vadim Kolesnikov
  */
-public interface WtstObject {
+public interface WtslObject {
 
     Object value(int index);
 

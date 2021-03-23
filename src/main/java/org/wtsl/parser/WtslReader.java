@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser;
+package org.wtsl.parser;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,9 +29,9 @@ import java.util.function.Predicate;
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstReader {
+public class WtslReader {
 
-    private final List<WtstReader> take;
+    private final List<WtslReader> take;
 
     private final Expression when;
 
@@ -42,7 +42,7 @@ public class WtstReader {
     private final Map<String, Expression> then;
 
     @JsonCreator
-    public WtstReader(@JsonProperty("take") List<WtstReader> take,
+    public WtslReader(@JsonProperty("take") List<WtslReader> take,
                       @JsonProperty("when") String when,
                       @JsonProperty("till") String till,
                       @JsonProperty("skip") String skip,
@@ -50,29 +50,29 @@ public class WtstReader {
 
         this.take = take;
 
-        this.when = WtstUtils.parse(when);
-        this.till = WtstUtils.parse(till);
-        this.skip = WtstUtils.parse(skip);
+        this.when = WtslUtils.parse(when);
+        this.till = WtslUtils.parse(till);
+        this.skip = WtslUtils.parse(skip);
 
         this.then = new LinkedHashMap<>();
         if (then != null) {
-            then.forEach((name, exp) -> this.then.put(name, WtstUtils.parse(exp)));
+            then.forEach((name, exp) -> this.then.put(name, WtslUtils.parse(exp)));
         }
     }
 
-    public List<WtstReader> getTake() {
+    public List<WtslReader> getTake() {
         return take;
     }
 
-    public boolean isWhen(EvaluationContext context, WtstObject object) {
+    public boolean isWhen(EvaluationContext context, WtslObject object) {
         return Boolean.TRUE.equals(when.getValue(context, object));
     }
 
-    public boolean isTill(EvaluationContext context, WtstObject object) {
+    public boolean isTill(EvaluationContext context, WtslObject object) {
         return !Boolean.FALSE.equals(till.getValue(context, object));
     }
 
-    public boolean isSkip(EvaluationContext context, WtstObject object) {
+    public boolean isSkip(EvaluationContext context, WtslObject object) {
         return Boolean.TRUE.equals(skip.getValue(context, object));
     }
 

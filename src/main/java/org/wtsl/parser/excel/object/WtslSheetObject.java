@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wtst.parser.excel.object;
+package org.wtsl.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,13 +22,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 /**
  * @author Vadim Kolesnikov
  */
-public class WtstSheetObject {
+public class WtslSheetObject {
 
     private final Workbook workbook;
 
     private final Sheet sheet;
 
-    public WtstSheetObject(Workbook workbook, Sheet sheet) {
+    public WtslSheetObject(Workbook workbook, Sheet sheet) {
         this.workbook = workbook;
         this.sheet = sheet;
     }
