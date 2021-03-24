@@ -22,17 +22,24 @@
 
     <developers>
         <developer>
-            <id>wk-v</id>
             <name>Vadim Kolesnikov</name>
-            <email>vadim_kolesnikov@outlook.com</email>
+            <email>wk-v@wtsl.org</email>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/wtsl/wtsl-parser</connection>
-        <developerConnection>scm:git:git://github.com/wtsl/wtsl-parser</developerConnection>
+        <connection>scm:git:git://github.com/wtsl/wtsl-parser.git</connection>
+        <developerConnection>scm:git:ssh://github.com:wtsl/wtsl-parser.git</developerConnection>
         <url>https://github.com/wtsl/wtsl-parser</url>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <name>Central Repository OSSRH</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -87,7 +94,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -104,6 +111,26 @@
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
