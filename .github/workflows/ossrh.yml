@@ -11,16 +11,14 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 1.8
-        server-id: OSSRH_ID
+        server-id: ossrh
         server-username: OSSRH_USER
         server-password: OSSRH_PASS
-        gpg-private-key: GPG_PK
+        gpg-private-key: ${{ secrets.GPG_PK }}
         gpg-passphrase: GPG_PP
 
     - run: mvn deploy
       env:
-        OSSRH_ID: ossrh
         OSSRH_USER: wk-v
         OSSRH_PASS: ${{ secrets.OSSRH_PASS }}
-        GPG_PK: ${{ secrets.GPG_PK }}
         GPG_PP: ${{ secrets.GPG_PP }}
