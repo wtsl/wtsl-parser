@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -96,15 +97,15 @@ public class WtslExcelParser implements WtslParser {
             final Expression exp = writer.getValue();
 
             if (exp.getExpressionString().matches("^forEach\\([\\s\\S]+\\)$")) {
-                stream = stream.flatMap(ctx -> WtslUtils.stream(exp.getValue(ctx, obj)).map(value -> ctx.next(name, value)));
+                stream = stream.flatMap(ctx -> WtslUtils.stream(exp.getValue(ctx, obj)).map(val -> ctx.next(name, val)));
             } else if (exp.getExpressionString().matches("^removeIf\\([\\s\\S]+\\)$")) {
-                stream = stream.filter(ctx -> !TRUE.equals(exp.getValue(ctx, obj))).map(ctx -> ctx.next(name, false));
+                stream = stream.filter(ctx -> !TRUE.equals(exp.getValue(ctx, obj)));
             } else {
-                stream = stream.map(ctx -> ctx.next(name, exp.getValue(ctx, obj)));
+                stream = stream.map(ctx -> ctx.same(name, exp.getValue(ctx, obj)));
             }
         }
 
-        return stream.map(WtslContext::getVariables).collect(Collectors.toList());
+        return stream.map(WtslContext::getVariables).collect(Collectors.toCollection(LinkedList::new));
     }
 
     private WtslObject build(Map<String, Object> entries, Object node, int lvl) {

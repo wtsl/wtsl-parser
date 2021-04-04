@@ -33,6 +33,12 @@ public class WtslContext extends StandardEvaluationContext {
         this.variables = new LinkedHashMap<>(variables);
     }
 
+    public WtslContext same(String name, Object value) {
+        setVariable(name, value);
+
+        return this;
+    }
+
     public WtslContext next(String name, Object value) {
         WtslContext context = new WtslContext(variables);
         context.setVariable(name, value);
