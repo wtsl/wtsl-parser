@@ -16,23 +16,16 @@
 
 package org.wtsl.parser.excel;
 
-import org.wtsl.parser.WtslObject;
+import org.wtsl.parser.WtslStream;
 
 import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslExcelObject implements WtslObject {
+public class WtslExcelStream extends WtslExcelObject implements WtslStream {
 
-    private final Map<String, ?> entries;
-
-    public WtslExcelObject(Map<String, ?> entries) {
-        this.entries = entries;
-    }
-
-    @Override
-    public Map<String, ?> getEntries() {
-        return entries;
+    public WtslExcelStream(Map<String, ?> entries) {
+        super(entries);
     }
 }

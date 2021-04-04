@@ -22,9 +22,8 @@ import org.springframework.expression.spel.SpelCompilerMode;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -61,5 +60,28 @@ public class WtslUtils {
         }
 
         return Stream.of(object);
+    }
+
+    public static <T, R> Iterator<R> iterator(int limit, Iterable<T> iterable, Function<T, R> function) {
+        return new Iterator<R>() {
+
+            final Iterator<T> iterator = iterable.iterator();
+
+            int count = 0;
+
+            @Override
+            public boolean hasNext() {
+                return count < limit && iterator.hasNext();
+            }
+
+            @Override
+            public R next() {
+                if (hasNext()) {
+                    count++;
+                    return function.apply(iterator.next());
+                }
+                throw new NoSuchElementException();
+            }
+        };
     }
 }

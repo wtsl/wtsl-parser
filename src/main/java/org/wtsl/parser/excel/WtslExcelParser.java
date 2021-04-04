@@ -16,12 +16,12 @@
 
 package org.wtsl.parser.excel;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.expression.Expression;
 import org.wtsl.parser.*;
+import org.wtsl.parser.excel.object.WtslCellObject;
+import org.wtsl.parser.excel.object.WtslRowObject;
+import org.wtsl.parser.excel.object.WtslSheetObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,43 +42,22 @@ public class WtslExcelParser implements WtslParser {
     @Override
     public List<Map<String, Object>> parse(Map<String, Object> metadata, WtslSchema schema, InputStream stream) {
         Map<String, Object> entries = new LinkedHashMap<>(schema.getEntries());
-
         try (Workbook workbook = WorkbookFactory.create(stream)) {
-            read(metadata, entries, schema.getReaders(), workbook);
+            if (!schema.getReaders().isEmpty()) {
+                read(metadata, entries, schema.getReaders(), workbook, 1);
+            }
             return write(metadata, entries, schema.getWriters());
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
 
-    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Workbook workbook) {
-        if (readers == null || readers.isEmpty()) {
-            return;
-        }
-
-        for (Sheet sheet : workbook) {
-            WtslContext ctx = new WtslContext(metadata);
-            WtslObject obj = new WtslExcelObject(entries, workbook, sheet);
-
-            for (WtslReader reader : readers) {
-                if (reader.isWhen(ctx, obj)) {
-                    reader.doThen(ctx, obj, name -> true);
-                    read(metadata, entries, reader.getTake(), workbook, sheet);
-                }
-            }
-        }
-    }
-
-    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Workbook workbook, Sheet sheet) {
-        if (readers == null || readers.isEmpty()) {
-            return;
-        }
-
+    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Iterable<?> element, int lvl) {
         WtslReader reader = null;
         WtslContext ctx = null;
 
-        for (Row row : sheet) {
-            WtslObject obj = new WtslExcelObject(entries, workbook, sheet, row);
+        for (Object node : element) {
+            WtslObject obj = build(entries, node, lvl);
 
             if (reader != null && reader.isTill(ctx, obj)) {
                 reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
@@ -99,12 +78,16 @@ public class WtslExcelParser implements WtslParser {
 
             if (reader != null && !reader.isSkip(ctx, obj)) {
                 reader.doThen(ctx, obj, name -> !(name.charAt(0) == '$' || name.charAt(name.length() - 1) == '$'));
+
+                if (!reader.getTake().isEmpty()) {
+                    read(metadata, entries, reader.getTake(), (Iterable<?>) node, lvl + 1);
+                }
             }
         }
     }
 
     private List<Map<String, Object>> write(Map<String, Object> metadata, Map<String, Object> entries, Map<String, Expression> writers) {
-        WtslObject obj = new WtslExcelObject(entries);
+        WtslObject obj = new WtslExcelStream(entries);
 
         Stream<WtslContext> stream = Stream.of(new WtslContext(metadata));
 
@@ -122,5 +105,18 @@ public class WtslExcelParser implements WtslParser {
         }
 
         return stream.map(WtslContext::getVariables).collect(Collectors.toList());
+    }
+
+    private WtslObject build(Map<String, Object> entries, Object node, int lvl) {
+        switch (lvl) {
+            case 1:
+                return new WtslSheetObject(entries, (Sheet) node);
+            case 2:
+                return new WtslRowObject(entries, (Row) node);
+            case 3:
+                return new WtslCellObject(entries, (Cell) node);
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 }

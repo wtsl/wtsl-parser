@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package org.wtsl.parser.excel;
+package org.wtsl.parser;
 
-import org.wtsl.parser.WtslObject;
-
-import java.util.Map;
+import java.util.Iterator;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslExcelObject implements WtslObject {
+public interface WtslValues {
 
-    private final Map<String, ?> entries;
+    int size();
 
-    public WtslExcelObject(Map<String, ?> entries) {
-        this.entries = entries;
-    }
+    Object get(int index);
 
-    @Override
-    public Map<String, ?> getEntries() {
-        return entries;
+    Object get(String key);
+
+    Iterator<?> all(int limit);
+
+    default Iterator<?> all() {
+        return all(Integer.MAX_VALUE);
     }
 }

@@ -16,60 +16,86 @@
 
 package org.wtsl.parser.excel.object;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Font;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslCellObject {
+public class WtslCellObject extends WtslRowObject {
 
-    private final Workbook workbook;
-
-    private final Sheet sheet;
-
-    private final Row row;
+    private static final Object UNKNOWN_TYPE = new Object();
 
     private final Cell cell;
 
-    public WtslCellObject(Workbook workbook, Sheet sheet, Row row, Cell cell) {
-        this.workbook = workbook;
-        this.sheet = sheet;
-        this.row = row;
+    public WtslCellObject(Map<String, ?> entries, Cell cell) {
+        super(entries, cell.getRow());
         this.cell = cell;
     }
 
-    public WtslFontObject font() {
-        if (cell instanceof XSSFCell) {
-            return new WtslFontObject(workbook, sheet, row, cell, ((XSSFCell) cell).getCellStyle().getFont());
-        }
-
-        if (cell instanceof HSSFCell && workbook instanceof HSSFWorkbook) {
-            return new WtslFontObject(workbook, sheet, row, cell, ((HSSFCell) cell).getCellStyle().getFont(workbook));
-        }
-
-        return new WtslFontObject(workbook, sheet, row, cell, null);
+    public Cell getCell() {
+        return cell;
     }
 
-    public Object value() {
-        if (cell != null) {
-            switch (cell.getCellType()) {
-                case BLANK:
-                case STRING:
-                case FORMULA:
-                    return cell.getStringCellValue();
-                case NUMERIC:
-                    if (DateUtil.isCellDateFormatted(cell)) {
-                        return cell.getLocalDateTimeCellValue();
-                    }
-                    return cell.getNumericCellValue();
-                case BOOLEAN:
-                    return cell.getBooleanCellValue();
-            }
-        }
+    @Override
+    public int size() {
+        throw new UnsupportedOperationException();
+    }
 
-        return "";
+    @Override
+    public WtslCellObject get(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public WtslCellObject get(String key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Iterator<WtslCellObject> all(int limit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isVisible() {
+        return !getSheet().isColumnHidden(getCell().getColumnIndex());
+    }
+
+    public String getType() {
+        return getCell().getCellType().name();
+    }
+
+    public Font getFont() {
+        return getBook().getFontAt(getStyle().getFontIndex());
+    }
+
+    public CellStyle getStyle() {
+        return getCell().getCellStyle();
+    }
+
+    public Object getValue() {
+        switch (getCell().getCellType()) {
+            case ERROR:
+                return getCell().getErrorCellValue();
+            case BLANK:
+            case STRING:
+            case FORMULA:
+                return getCell().getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(getCell())) {
+                    return getCell().getLocalDateTimeCellValue();
+                }
+                return getCell().getNumericCellValue();
+            case BOOLEAN:
+                return getCell().getBooleanCellValue();
+            default:
+                return UNKNOWN_TYPE;
+        }
     }
 }

@@ -17,27 +17,100 @@
 package org.wtsl.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellReference;
+import org.wtsl.parser.WtslUtils;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslRowObject {
+public class WtslRowObject extends WtslSheetObject {
 
-    private final Workbook workbook;
-
-    private final Sheet sheet;
+    private static final Map<String, Integer> NAME_CACHE = IntStream.range(0, 100).boxed().collect
+            (Collectors.toMap(CellReference::convertNumToColString, Function.identity()));
 
     private final Row row;
 
-    public WtslRowObject(Workbook workbook, Sheet sheet, Row row) {
-        this.workbook = workbook;
-        this.sheet = sheet;
+    public WtslRowObject(Map<String, ?> entries, Row row) {
+        super(entries, row.getSheet());
         this.row = row;
     }
 
-    public int number() {
-        return row == null ? -1 : row.getRowNum() + 1;
+    public Row getRow() {
+        return row;
+    }
+
+    @Override
+    public int size() {
+        return getRow().getPhysicalNumberOfCells();
+    }
+
+    @Override
+    public WtslCellObject get(int index) {
+        return new WtslCellObject(getEntries(), getRow().getCell(index, CREATE_NULL_AS_BLANK));
+    }
+
+    @Override
+    public WtslCellObject get(String key) {
+        return get(NAME_CACHE.computeIfAbsent(key, CellReference::convertColStringToIndex));
+    }
+
+    @Override
+    public Iterator<? extends WtslCellObject> all(int limit) {
+        return WtslUtils.iterator(limit, getRow(), cell -> new WtslCellObject(getEntries(), cell));
+    }
+
+    @Override
+    public boolean isVisible() {
+        return !getRow().getZeroHeight();
+    }
+
+    // short links
+
+    public Object type(int index) {
+        return get(index).getType();
+    }
+
+    public Object type(String key) {
+        return get(key).getType();
+    }
+
+    public Object font(int index) {
+        return get(index).getFont();
+    }
+
+    public Object font(String key) {
+        return get(key).getFont();
+    }
+
+    public Object style(int index) {
+        return get(index).getStyle();
+    }
+
+    public Object style(String key) {
+        return get(key).getStyle();
+    }
+
+    public Object value(int index) {
+        return get(index).getValue();
+    }
+
+    public Object value(String key) {
+        return get(key).getValue();
+    }
+
+    public Object visible(int index) {
+        return get(index).isVisible();
+    }
+
+    public Object visible(String key) {
+        return get(key).isVisible();
     }
 }

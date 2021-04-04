@@ -18,6 +18,7 @@ package org.wtsl.parser;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 
@@ -48,7 +49,7 @@ public class WtslReader {
                       @JsonProperty("skip") String skip,
                       @JsonProperty("then") Map<String, String> then) {
 
-        this.take = take;
+        this.take = ListUtils.emptyIfNull(take);
 
         this.when = WtslUtils.parse(when);
         this.till = WtslUtils.parse(till);

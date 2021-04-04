@@ -14,34 +14,18 @@
  * limitations under the License.
  */
 
-package org.wtsl.parser.excel.object;
-
-import org.apache.poi.ss.usermodel.*;
+package org.wtsl.parser;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslFontObject {
+public interface WtslStream extends WtslObject {
 
-    private final Workbook workbook;
-
-    private final Sheet sheet;
-
-    private final Row row;
-
-    private final Cell cell;
-
-    private final Font font;
-
-    public WtslFontObject(Workbook workbook, Sheet sheet, Row row, Cell cell, Font font) {
-        this.workbook = workbook;
-        this.sheet = sheet;
-        this.row = row;
-        this.cell = cell;
-        this.font = font;
+    default Object forEach(Object object) {
+        return object;
     }
 
-    public boolean isStrikeout() {
-        return font != null && font.getStrikeout();
+    default Object removeIf(Object object) {
+        return object;
     }
 }

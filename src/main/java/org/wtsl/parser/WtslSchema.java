@@ -18,6 +18,7 @@ package org.wtsl.parser;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.expression.Expression;
 
 import java.util.LinkedHashMap;
@@ -40,7 +41,7 @@ public class WtslSchema {
                       @JsonProperty("entries") Map<String, String> entries,
                       @JsonProperty("writers") Map<String, String> writers) {
 
-        this.readers = readers;
+        this.readers = ListUtils.emptyIfNull(readers);
 
         this.entries = new LinkedHashMap<>();
         if (entries != null) {

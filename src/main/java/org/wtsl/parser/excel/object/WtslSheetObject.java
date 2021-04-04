@@ -17,27 +17,58 @@
 package org.wtsl.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.SheetVisibility;
+import org.wtsl.parser.WtslUtils;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslSheetObject {
-
-    private final Workbook workbook;
+public class WtslSheetObject extends WtslBookObject {
 
     private final Sheet sheet;
 
-    public WtslSheetObject(Workbook workbook, Sheet sheet) {
-        this.workbook = workbook;
+    public WtslSheetObject(Map<String, ?> entries, Sheet sheet) {
+        super(entries, sheet.getWorkbook());
         this.sheet = sheet;
     }
 
-    public int number() {
-        return workbook == null ? -1 : workbook.getSheetIndex(sheet) + 1;
+    public Sheet getSheet() {
+        return sheet;
     }
 
-    public String name() {
-        return sheet == null ? null : sheet.getSheetName();
+    @Override
+    public int size() {
+        return getSheet().getPhysicalNumberOfRows();
+    }
+
+    @Override
+    public WtslRowObject get(int index) {
+        return new WtslRowObject(getEntries(), getSheet().getRow(index));
+    }
+
+    @Override
+    public WtslRowObject get(String key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Iterator<? extends WtslRowObject> all(int limit) {
+        return WtslUtils.iterator(limit, getSheet(), row -> new WtslRowObject(getEntries(), row));
+    }
+
+    @Override
+    public boolean isVisible() {
+        return getBook().getSheetVisibility(getBook().getSheetIndex(getSheet())) == SheetVisibility.VISIBLE;
+    }
+
+    public boolean isProtected() {
+        return getSheet().getProtect();
+    }
+
+    public String getSheetName() {
+        return getSheet().getSheetName();
     }
 }
