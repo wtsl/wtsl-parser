@@ -62,8 +62,8 @@ public class WtslUtils {
         return Stream.of(object);
     }
 
-    public static <T, R> Iterator<R> iterator(int limit, Iterable<T> iterable, Function<T, R> function) {
-        return new Iterator<R>() {
+    public static <T, R> Iterable<R> iterator(int limit, Iterable<T> iterable, Function<T, R> function) {
+        return () -> new Iterator<R>() {
 
             final Iterator<T> iterator = iterable.iterator();
 

@@ -16,8 +16,6 @@
 
 package org.wtsl.parser;
 
-import java.util.Iterator;
-
 /**
  * @author Vadim Kolesnikov
  */
@@ -29,9 +27,9 @@ public interface WtslValues {
 
     Object get(String key);
 
-    Iterator<?> all(int limit);
+    Iterable<?> all(int limit);
 
-    default Iterator<?> all() {
+    default Iterable<?> all() {
         return all(Integer.MAX_VALUE);
     }
 }

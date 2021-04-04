@@ -63,7 +63,7 @@ public class WtslRowObject extends WtslSheetObject {
     }
 
     @Override
-    public Iterator<? extends WtslCellObject> all(int limit) {
+    public Iterable<? extends WtslCellObject> all(int limit) {
         return WtslUtils.iterator(limit, getRow(), cell -> new WtslCellObject(getEntries(), cell));
     }
 

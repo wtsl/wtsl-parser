@@ -58,7 +58,7 @@ public class WtslCellObject extends WtslRowObject {
     }
 
     @Override
-    public Iterator<WtslCellObject> all(int limit) {
+    public Iterable<WtslCellObject> all(int limit) {
         throw new UnsupportedOperationException();
     }
 
