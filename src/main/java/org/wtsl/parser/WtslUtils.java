@@ -34,8 +34,32 @@ public class WtslUtils {
     private static final ExpressionParser EXP_PARSER = new SpelExpressionParser
             (new SpelParserConfiguration(SpelCompilerMode.MIXED, null, true, true, Integer.MAX_VALUE));
 
-    public static Expression parse(String exp) {
-        return EXP_PARSER.parseExpression(String.valueOf(exp));
+    public static Expression parse(String name, String exp) {
+        try {
+            return EXP_PARSER.parseExpression(String.valueOf(exp));
+        } catch (Exception ex) {
+            throw new WtslException(name + ": \"" + exp + "\"", ex);
+        }
+    }
+
+    public static Object value(String name, Expression exp) {
+        try {
+            return exp.getValue();
+        } catch (Exception ex) {
+            throw new WtslException(name + ": \"" + exp.getExpressionString() + "\"", ex, exp);
+        }
+    }
+
+    public static Object value(String name, Expression exp, WtslContext ctx, WtslObject obj) {
+        try {
+            return exp.getValue(ctx, obj);
+        } catch (Exception ex) {
+            throw new WtslException(name + ": \"" + exp.getExpressionString() + "\"", ex, exp, ctx, obj);
+        }
+    }
+
+    public static Object value(String name, String exp) {
+        return value(name, parse(name, exp));
     }
 
     public static Stream<?> stream(Object object) {

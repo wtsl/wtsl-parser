@@ -20,7 +20,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetVisibility;
 import org.wtsl.parser.WtslUtils;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**

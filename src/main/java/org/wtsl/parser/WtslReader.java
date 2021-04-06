@@ -19,7 +19,6 @@ package org.wtsl.parser;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 
 import java.util.LinkedHashMap;
@@ -31,6 +30,12 @@ import java.util.function.Predicate;
  * @author Vadim Kolesnikov
  */
 public class WtslReader {
+
+    private static final String WHEN = "when";
+
+    private static final String TILL = "till";
+
+    private static final String SKIP = "skip";
 
     private final List<WtslReader> take;
 
@@ -44,20 +49,20 @@ public class WtslReader {
 
     @JsonCreator
     public WtslReader(@JsonProperty("take") List<WtslReader> take,
-                      @JsonProperty("when") String when,
-                      @JsonProperty("till") String till,
-                      @JsonProperty("skip") String skip,
+                      @JsonProperty(WHEN) String when,
+                      @JsonProperty(TILL) String till,
+                      @JsonProperty(SKIP) String skip,
                       @JsonProperty("then") Map<String, String> then) {
 
         this.take = ListUtils.emptyIfNull(take);
 
-        this.when = WtslUtils.parse(when);
-        this.till = WtslUtils.parse(till);
-        this.skip = WtslUtils.parse(skip);
+        this.when = WtslUtils.parse(WHEN, when);
+        this.till = WtslUtils.parse(TILL, till);
+        this.skip = WtslUtils.parse(SKIP, skip);
 
         this.then = new LinkedHashMap<>();
         if (then != null) {
-            then.forEach((name, exp) -> this.then.put(name, WtslUtils.parse(exp)));
+            then.forEach((name, exp) -> this.then.put(name, WtslUtils.parse(name, exp)));
         }
     }
 
@@ -65,22 +70,22 @@ public class WtslReader {
         return take;
     }
 
-    public boolean isWhen(EvaluationContext context, WtslObject object) {
-        return Boolean.TRUE.equals(when.getValue(context, object));
+    public boolean isWhen(WtslContext ctx, WtslObject obj) {
+        return Boolean.TRUE.equals(WtslUtils.value(WHEN, when, ctx, obj));
     }
 
-    public boolean isTill(EvaluationContext context, WtslObject object) {
-        return !Boolean.FALSE.equals(till.getValue(context, object));
+    public boolean isTill(WtslContext ctx, WtslObject obj) {
+        return !Boolean.FALSE.equals(WtslUtils.value(TILL, till, ctx, obj));
     }
 
-    public boolean isSkip(EvaluationContext context, WtslObject object) {
-        return Boolean.TRUE.equals(skip.getValue(context, object));
+    public boolean isSkip(WtslContext ctx, WtslObject obj) {
+        return Boolean.TRUE.equals(WtslUtils.value(SKIP, skip, ctx, obj));
     }
 
-    public void doThen(EvaluationContext ctx, Object obj, Predicate<String> filter) {
+    public void doThen(WtslContext ctx, WtslObject obj, Predicate<String> filter) {
         then.forEach((name, exp) -> {
             if (filter.test(name)) {
-                ctx.setVariable(name, exp.getValue(ctx, obj));
+                ctx.setVariable(name, WtslUtils.value(name, exp, ctx, obj));
             }
         });
     }

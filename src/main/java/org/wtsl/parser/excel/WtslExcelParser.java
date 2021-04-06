@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
+import static org.wtsl.parser.WtslUtils.stream;
+import static org.wtsl.parser.WtslUtils.value;
 
 /**
  * @author Vadim Kolesnikov
@@ -54,8 +56,8 @@ public class WtslExcelParser implements WtslParser {
     }
 
     private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Iterable<?> element, int lvl) {
+        WtslContext ctx = new WtslContext();
         WtslReader reader = null;
-        WtslContext ctx = null;
 
         for (Object node : element) {
             WtslObject obj = build(entries, node, lvl);
@@ -66,7 +68,7 @@ public class WtslExcelParser implements WtslParser {
             }
 
             if (reader == null) {
-                ctx = new WtslContext(metadata);
+                ctx.setVariables(metadata);
 
                 for (WtslReader temp : readers) {
                     if (temp.isWhen(ctx, obj)) {
@@ -97,11 +99,11 @@ public class WtslExcelParser implements WtslParser {
             final Expression exp = writer.getValue();
 
             if (exp.getExpressionString().matches("^forEach\\([\\s\\S]+\\)$")) {
-                stream = stream.flatMap(ctx -> WtslUtils.stream(exp.getValue(ctx, obj)).map(val -> ctx.next(name, val)));
+                stream = stream.flatMap(ctx -> stream(value(name, exp, ctx, obj)).map(val -> ctx.next(name, val)));
             } else if (exp.getExpressionString().matches("^removeIf\\([\\s\\S]+\\)$")) {
-                stream = stream.filter(ctx -> !TRUE.equals(exp.getValue(ctx, obj)));
+                stream = stream.filter(ctx -> !TRUE.equals(value(name, exp, ctx, obj)));
             } else {
-                stream = stream.map(ctx -> ctx.same(name, exp.getValue(ctx, obj)));
+                stream = stream.map(ctx -> ctx.same(name, value(name, exp, ctx, obj)));
             }
         }
 

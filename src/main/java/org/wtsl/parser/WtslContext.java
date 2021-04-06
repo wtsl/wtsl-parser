@@ -19,18 +19,23 @@ package org.wtsl.parser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Vadim Kolesnikov
  */
 public class WtslContext extends StandardEvaluationContext {
 
-    private final Map<String, Object> variables;
+    private Map<String, Object> variables;
+
+    public WtslContext() {
+        setVariables(Collections.emptyMap());
+    }
 
     public WtslContext(Map<String, Object> variables) {
-        this.variables = new LinkedHashMap<>(variables);
+        setVariables(variables);
     }
 
     public WtslContext same(String name, Object value) {
@@ -51,6 +56,11 @@ public class WtslContext extends StandardEvaluationContext {
     }
 
     @Override
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = new TreeMap<>(variables);
+    }
+
+    @Override
     public Object lookupVariable(String name) {
         return variables.get(name);
     }
@@ -58,11 +68,6 @@ public class WtslContext extends StandardEvaluationContext {
     @Override
     public void setVariable(String name, Object value) {
         variables.put(name, value);
-    }
-
-    @Override
-    public void setVariables(Map<String, Object> variables) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

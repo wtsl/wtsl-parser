@@ -45,12 +45,12 @@ public class WtslSchema {
 
         this.entries = new LinkedHashMap<>();
         if (entries != null) {
-            entries.forEach((name, exp) -> this.entries.put(name, WtslUtils.parse(exp).getValue()));
+            entries.forEach((name, exp) -> this.entries.put(name, WtslUtils.value(name, exp)));
         }
 
         this.writers = new LinkedHashMap<>();
         if (writers != null) {
-            writers.forEach((name, exp) -> this.writers.put(name, WtslUtils.parse(exp)));
+            writers.forEach((name, exp) -> this.writers.put(name, WtslUtils.parse(name, exp)));
         }
     }
 
