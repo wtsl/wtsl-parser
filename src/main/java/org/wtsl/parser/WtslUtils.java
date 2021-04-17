@@ -31,6 +31,8 @@ import java.util.stream.Stream;
  */
 public class WtslUtils {
 
+    private static final String ERROR_FORMAT = "expression: [ %s: %s ]";
+
     private static final ExpressionParser EXP_PARSER = new SpelExpressionParser
             (new SpelParserConfiguration(SpelCompilerMode.MIXED, null, true, true, Integer.MAX_VALUE));
 
@@ -38,7 +40,7 @@ public class WtslUtils {
         try {
             return EXP_PARSER.parseExpression(String.valueOf(exp));
         } catch (Exception ex) {
-            throw new WtslException(name + ": \"" + exp + "\"", ex);
+            throw new WtslException(String.format(ERROR_FORMAT, name, exp), ex);
         }
     }
 
@@ -46,7 +48,7 @@ public class WtslUtils {
         try {
             return exp.getValue();
         } catch (Exception ex) {
-            throw new WtslException(name + ": \"" + exp.getExpressionString() + "\"", ex, exp);
+            throw new WtslException(String.format(ERROR_FORMAT, name, exp.getExpressionString()), ex, exp);
         }
     }
 
@@ -54,7 +56,7 @@ public class WtslUtils {
         try {
             return exp.getValue(ctx, obj);
         } catch (Exception ex) {
-            throw new WtslException(name + ": \"" + exp.getExpressionString() + "\"", ex, exp, ctx, obj);
+            throw new WtslException(String.format(ERROR_FORMAT, name, exp.getExpressionString()) + obj, ex, exp, ctx, obj);
         }
     }
 

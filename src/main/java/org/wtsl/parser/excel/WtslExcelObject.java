@@ -35,4 +35,9 @@ public class WtslExcelObject implements WtslObject {
     public Map<String, ?> getEntries() {
         return entries;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", entries: [ " + String.join(" | ", entries.keySet()) + " ]";
+    }
 }

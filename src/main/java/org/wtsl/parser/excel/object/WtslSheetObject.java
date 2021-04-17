@@ -70,4 +70,13 @@ public class WtslSheetObject extends WtslBookObject {
     public String getSheetName() {
         return getSheet().getSheetName();
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", sheet: [ size: " + size()
+                + ", visible: " + isVisible()
+                + ", name: " + getSheetName()
+                + ", protected: " + isProtected()
+                + " ]";
+    }
 }

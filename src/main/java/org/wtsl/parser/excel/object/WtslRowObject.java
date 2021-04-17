@@ -16,6 +16,7 @@
 
 package org.wtsl.parser.excel.object;
 
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellReference;
 import org.wtsl.parser.WtslUtils;
@@ -25,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.lang.Integer.MAX_VALUE;
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK;
 
 /**
@@ -44,6 +46,10 @@ public class WtslRowObject extends WtslSheetObject {
 
     public Row getRow() {
         return row;
+    }
+
+    public int getRowNum() {
+        return getRow().getRowNum();
     }
 
     @Override
@@ -111,5 +117,16 @@ public class WtslRowObject extends WtslSheetObject {
 
     public Object visible(String key) {
         return get(key).isVisible();
+    }
+
+    @Override
+    public String toString() {
+        DataFormatter formatter = new DataFormatter();
+
+        return super.toString() + ", row: [ size: " + size()
+                + ", visible: " + isVisible()
+                + ", index: " + getRowNum()
+                + ", values: " + String.join(" | ", WtslUtils.iterator(MAX_VALUE, getRow(), formatter::formatCellValue))
+                + " ]";
     }
 }

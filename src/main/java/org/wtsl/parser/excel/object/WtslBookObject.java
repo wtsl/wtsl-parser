@@ -66,4 +66,12 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
     public String getVersion() {
         return getBook().getSpreadsheetVersion().name();
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", book: [ size: " + size()
+                + ", visible: " + isVisible()
+                + ", version: " + getVersion()
+                + " ]";
+    }
 }

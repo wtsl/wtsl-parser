@@ -41,6 +41,10 @@ public class WtslCellObject extends WtslRowObject {
         return cell;
     }
 
+    public int getColNum() {
+        return getCell().getColumnIndex();
+    }
+
     @Override
     public int size() {
         throw new UnsupportedOperationException();
@@ -96,5 +100,13 @@ public class WtslCellObject extends WtslRowObject {
             default:
                 return UNKNOWN_TYPE;
         }
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", cell: [ type: " + getType()
+                + ", visible: " + isVisible()
+                + ", index: " + getColNum()
+                + " ]";
     }
 }
