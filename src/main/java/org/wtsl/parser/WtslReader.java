@@ -37,6 +37,8 @@ public class WtslReader {
 
     private static final String SKIP = "skip";
 
+    private static final String EXEC = "exec";
+
     private final List<WtslReader> take;
 
     private final Expression when;
@@ -45,6 +47,8 @@ public class WtslReader {
 
     private final Expression skip;
 
+    private final Expression exec;
+
     private final Map<String, Expression> then;
 
     @JsonCreator
@@ -52,6 +56,7 @@ public class WtslReader {
                       @JsonProperty(WHEN) String when,
                       @JsonProperty(TILL) String till,
                       @JsonProperty(SKIP) String skip,
+                      @JsonProperty(EXEC) String exec,
                       @JsonProperty("then") Map<String, String> then) {
 
         this.take = ListUtils.emptyIfNull(take);
@@ -59,6 +64,7 @@ public class WtslReader {
         this.when = WtslUtils.parse(WHEN, when);
         this.till = WtslUtils.parse(TILL, till);
         this.skip = WtslUtils.parse(SKIP, skip);
+        this.exec = WtslUtils.parse(EXEC, exec);
 
         this.then = new LinkedHashMap<>();
         if (then != null) {
@@ -80,6 +86,10 @@ public class WtslReader {
 
     public boolean isSkip(WtslContext ctx, WtslObject obj) {
         return Boolean.TRUE.equals(WtslUtils.value(SKIP, skip, ctx, obj));
+    }
+
+    public void doExec(WtslContext ctx, WtslObject obj) {
+        WtslUtils.value(EXEC, exec, ctx, obj);
     }
 
     public void doThen(WtslContext ctx, WtslObject obj, Predicate<String> filter) {

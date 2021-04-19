@@ -73,6 +73,7 @@ public class WtslExcelParser implements WtslParser {
                 for (WtslReader temp : readers) {
                     if (temp.isWhen(ctx, obj)) {
                         reader = temp;
+                        reader.doExec(ctx, obj);
                         reader.doThen(ctx, obj, name -> name.charAt(name.length() - 1) == '$');
                         break;
                     }
