@@ -26,10 +26,7 @@ import org.wtsl.parser.excel.object.WtslSheetObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,10 +56,12 @@ public class WtslExcelParser implements WtslParser {
         WtslContext ctx = new WtslContext();
         WtslReader reader = null;
 
-        for (Object node : element) {
+        Iterator<?> iterator = element.iterator();
+        while (iterator.hasNext()) {
+            Object node = iterator.next();
             WtslObject obj = build(entries, node, lvl);
 
-            if (reader != null && reader.isTill(ctx, obj)) {
+            if (reader != null && (reader.isTill(ctx, obj) || !iterator.hasNext())) {
                 reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
                 reader = null;
             }
