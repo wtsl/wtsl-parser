@@ -99,9 +99,9 @@ public class WtslExcelParser implements WtslParser {
             final String name = writer.getKey();
             final Expression exp = writer.getValue();
 
-            if (exp.getExpressionString().matches("^forEach\\([\\s\\S]+\\)$")) {
+            if (exp.getExpressionString().matches("^\\s?forEach\\([\\s\\S]+\\)\\s?$")) {
                 stream = stream.flatMap(ctx -> stream(value(name, exp, ctx, obj)).map(val -> ctx.next(name, val)));
-            } else if (exp.getExpressionString().matches("^removeIf\\([\\s\\S]+\\)$")) {
+            } else if (exp.getExpressionString().matches("^\\s?removeIf\\([\\s\\S]+\\)\\s?$")) {
                 stream = stream.filter(ctx -> !TRUE.equals(value(name, exp, ctx, obj)));
             } else {
                 stream = stream.map(ctx -> ctx.same(name, value(name, exp, ctx, obj)));
