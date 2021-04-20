@@ -35,8 +35,16 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
         this.book = book;
     }
 
-    public Workbook getBook() {
+    public final Workbook getBook() {
         return book;
+    }
+
+    public final boolean isBookVisible() {
+        return !getBook().isHidden();
+    }
+
+    public final String getBookVersion() {
+        return getBook().getSpreadsheetVersion().name();
     }
 
     @Override
@@ -59,19 +67,19 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
         return WtslUtils.iterator(limit, getBook(), sheet -> new WtslSheetObject(getEntries(), sheet));
     }
 
-    public boolean isVisible() {
-        return !getBook().isHidden();
+    public String getName() {
+        return getBookVersion();
     }
 
-    public String getVersion() {
-        return getBook().getSpreadsheetVersion().name();
+    public boolean isVisible() {
+        return isBookVisible();
     }
 
     @Override
     public String toString() {
         return super.toString() + ", book: [ size: " + size()
-                + ", visible: " + isVisible()
-                + ", version: " + getVersion()
+                + ", version: " + getBookVersion()
+                + ", visible: " + isBookVisible()
                 + " ]";
     }
 }

@@ -20,13 +20,20 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.util.CellReference;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Vadim Kolesnikov
  */
 public class WtslCellObject extends WtslRowObject {
+
+    private static final Map<Integer, String> NAME_CACHE = IntStream.range(0, 100).boxed().collect
+            (Collectors.toMap(Function.identity(), CellReference::convertNumToColString));
 
     private static final Object UNKNOWN_TYPE = new Object();
 
@@ -37,12 +44,20 @@ public class WtslCellObject extends WtslRowObject {
         this.cell = cell;
     }
 
-    public Cell getCell() {
+    public final Cell getCell() {
         return cell;
     }
 
-    public int getColNum() {
+    public final int getColNum() {
         return getCell().getColumnIndex();
+    }
+
+    public final String getColName() {
+        return NAME_CACHE.computeIfAbsent(getColNum(), CellReference::convertNumToColString);
+    }
+
+    public final boolean isColVisible() {
+        return !getSheet().isColumnHidden(getCell().getColumnIndex());
     }
 
     @Override
@@ -66,8 +81,18 @@ public class WtslCellObject extends WtslRowObject {
     }
 
     @Override
+    public String getName() {
+        return getColName();
+    }
+
+    @Override
+    public int getNumber() {
+        return getColNum();
+    }
+
+    @Override
     public boolean isVisible() {
-        return !getSheet().isColumnHidden(getCell().getColumnIndex());
+        return isColVisible();
     }
 
     public String getType() {
@@ -105,8 +130,9 @@ public class WtslCellObject extends WtslRowObject {
     @Override
     public String toString() {
         return super.toString() + ", cell: [ type: " + getType()
-                + ", visible: " + isVisible()
-                + ", index: " + getColNum()
+                + ", name: " + getColName()
+                + ", number: " + getColNum()
+                + ", visible: " + isColVisible()
                 + " ]";
     }
 }

@@ -34,8 +34,24 @@ public class WtslSheetObject extends WtslBookObject {
         this.sheet = sheet;
     }
 
-    public Sheet getSheet() {
+    public final Sheet getSheet() {
         return sheet;
+    }
+
+    public final int getSheetNum() {
+        return getBook().getSheetIndex(getSheet());
+    }
+
+    public final String getSheetName() {
+        return getSheet().getSheetName();
+    }
+
+    public final boolean isSheetVisible() {
+        return getBook().getSheetVisibility(getBook().getSheetIndex(getSheet())) == SheetVisibility.VISIBLE;
+    }
+
+    public final boolean isSheetProtected() {
+        return getSheet().getProtect();
     }
 
     @Override
@@ -59,24 +75,30 @@ public class WtslSheetObject extends WtslBookObject {
     }
 
     @Override
+    public String getName() {
+        return getSheetName();
+    }
+
+    public int getNumber() {
+        return getSheetNum();
+    }
+
+    @Override
     public boolean isVisible() {
-        return getBook().getSheetVisibility(getBook().getSheetIndex(getSheet())) == SheetVisibility.VISIBLE;
+        return isSheetVisible();
     }
 
     public boolean isProtected() {
-        return getSheet().getProtect();
-    }
-
-    public String getSheetName() {
-        return getSheet().getSheetName();
+        return isSheetProtected();
     }
 
     @Override
     public String toString() {
         return super.toString() + ", sheet: [ size: " + size()
-                + ", visible: " + isVisible()
                 + ", name: " + getSheetName()
-                + ", protected: " + isProtected()
+                + ", number: " + getSheetNum()
+                + ", visible: " + isSheetVisible()
+                + ", protected: " + isSheetProtected()
                 + " ]";
     }
 }

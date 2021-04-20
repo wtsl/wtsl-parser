@@ -32,7 +32,7 @@ public class WtslExcelObject implements WtslObject {
     }
 
     @Override
-    public Map<String, ?> getEntries() {
+    public final Map<String, ?> getEntries() {
         return entries;
     }
 

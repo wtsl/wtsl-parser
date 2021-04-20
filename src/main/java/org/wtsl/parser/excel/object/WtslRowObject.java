@@ -44,12 +44,20 @@ public class WtslRowObject extends WtslSheetObject {
         this.row = row;
     }
 
-    public Row getRow() {
+    public final Row getRow() {
         return row;
     }
 
-    public int getRowNum() {
+    public final int getRowNum() {
         return getRow().getRowNum();
+    }
+
+    public final String getRowName() {
+        return Integer.toString(getRowNum() + 1);
+    }
+
+    public final boolean isRowVisible() {
+        return !getRow().getZeroHeight();
     }
 
     @Override
@@ -73,8 +81,18 @@ public class WtslRowObject extends WtslSheetObject {
     }
 
     @Override
+    public String getName() {
+        return getRowName();
+    }
+
+    @Override
+    public int getNumber() {
+        return getRowNum();
+    }
+
+    @Override
     public boolean isVisible() {
-        return !getRow().getZeroHeight();
+        return isRowVisible();
     }
 
     // short links
@@ -124,8 +142,9 @@ public class WtslRowObject extends WtslSheetObject {
         DataFormatter formatter = new DataFormatter();
 
         return super.toString() + ", row: [ size: " + size()
-                + ", visible: " + isVisible()
-                + ", index: " + getRowNum()
+                + ", name: " + getRowName()
+                + ", number: " + getRowNum()
+                + ", visible: " + isRowVisible()
                 + ", values: " + String.join(" | ", WtslUtils.iterator(MAX_VALUE, getRow(), formatter::formatCellValue))
                 + " ]";
     }

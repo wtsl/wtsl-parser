@@ -23,6 +23,10 @@ public interface WtslValues {
 
     int size();
 
+    default boolean isEmpty() {
+        return size() == 0;
+    }
+
     Object get(int index);
 
     Object get(String key);
