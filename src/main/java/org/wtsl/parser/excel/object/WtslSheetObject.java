@@ -42,6 +42,10 @@ public class WtslSheetObject extends WtslBookObject {
         return getBook().getSheetIndex(getSheet());
     }
 
+    public final int getSheetSize() {
+        return getSheet().getPhysicalNumberOfRows();
+    }
+
     public final String getSheetName() {
         return getSheet().getSheetName();
     }
@@ -56,7 +60,7 @@ public class WtslSheetObject extends WtslBookObject {
 
     @Override
     public int size() {
-        return getSheet().getPhysicalNumberOfRows();
+        return getSheetSize();
     }
 
     @Override
@@ -94,11 +98,6 @@ public class WtslSheetObject extends WtslBookObject {
 
     @Override
     public String toString() {
-        return super.toString() + ", sheet: [ size: " + size()
-                + ", name: " + getSheetName()
-                + ", number: " + getSheetNum()
-                + ", visible: " + isSheetVisible()
-                + ", protected: " + isSheetProtected()
-                + " ]";
+        return super.toString() + "; sheet = " + getSheetName().replace("\n", "\\n");
     }
 }

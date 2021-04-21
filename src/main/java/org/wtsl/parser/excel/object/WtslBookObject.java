@@ -39,6 +39,10 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
         return book;
     }
 
+    public final int getBookSize() {
+        return getBook().getNumberOfSheets();
+    }
+
     public final boolean isBookVisible() {
         return !getBook().isHidden();
     }
@@ -49,7 +53,7 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
 
     @Override
     public int size() {
-        return getBook().getNumberOfSheets();
+        return getBookSize();
     }
 
     @Override
@@ -77,9 +81,6 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
 
     @Override
     public String toString() {
-        return super.toString() + ", book: [ size: " + size()
-                + ", version: " + getBookVersion()
-                + ", visible: " + isBookVisible()
-                + " ]";
+        return "book = " + getBookVersion();
     }
 }

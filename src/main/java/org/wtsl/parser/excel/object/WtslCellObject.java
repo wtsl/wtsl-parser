@@ -129,10 +129,6 @@ public class WtslCellObject extends WtslRowObject {
 
     @Override
     public String toString() {
-        return super.toString() + ", cell: [ type: " + getType()
-                + ", name: " + getColName()
-                + ", number: " + getColNum()
-                + ", visible: " + isColVisible()
-                + " ]";
+        return super.toString() + "; col = " + getColName();
     }
 }
