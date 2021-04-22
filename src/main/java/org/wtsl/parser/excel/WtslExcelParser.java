@@ -61,7 +61,7 @@ public class WtslExcelParser implements WtslParser {
             Object node = iterator.next();
             WtslObject obj = build(entries, node, lvl);
 
-            if (reader != null && (reader.isTill(ctx, obj) || !iterator.hasNext())) {
+            if (reader != null && reader.isTill(ctx, obj)) {
                 reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
                 reader = null;
             }
@@ -81,6 +81,10 @@ public class WtslExcelParser implements WtslParser {
 
             if (reader != null && !reader.isSkip(ctx, obj)) {
                 reader.doThen(ctx, obj, name -> !(name.charAt(0) == '$' || name.charAt(name.length() - 1) == '$'));
+
+                if (!iterator.hasNext()) {
+                    reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
+                }
 
                 if (!reader.getTake().isEmpty()) {
                     read(metadata, entries, reader.getTake(), (Iterable<?>) node, lvl + 1);
