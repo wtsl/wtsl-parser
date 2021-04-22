@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +40,16 @@ import static org.wtsl.parser.WtslUtils.value;
  * @author Vadim Kolesnikov
  */
 public class WtslExcelParser implements WtslParser {
+
+    private static final Predicate<String> PRE_EXP_FILTER = key -> key.charAt(key.length() - 1) == '$';
+
+    private static final Predicate<String> EXP_FILTER = key -> key.charAt(key.length() - 1) != '$' && key.charAt(0) != '$';
+
+    private static final Predicate<String> POST_EXP_FILTER = key -> key.charAt(0) == '$';
+
+    private static final Pattern FOR_EACH_FILTER = Pattern.compile("^\\s?forEach\\([\\s\\S]+\\)\\s?$");
+
+    private static final Pattern REMOVE_IF_FILTER = Pattern.compile("^\\s?removeIf\\([\\s\\S]+\\)\\s?$");
 
     @Override
     public List<Map<String, Object>> parse(Map<String, Object> metadata, WtslSchema schema, InputStream stream) {
@@ -62,7 +74,7 @@ public class WtslExcelParser implements WtslParser {
             WtslObject obj = build(entries, node, lvl);
 
             if (reader != null && reader.isTill(ctx, obj)) {
-                reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
+                reader.doThen(ctx, obj, POST_EXP_FILTER);
                 reader = null;
             }
 
@@ -73,17 +85,17 @@ public class WtslExcelParser implements WtslParser {
                     if (temp.isWhen(ctx, obj)) {
                         reader = temp;
                         reader.doExec(ctx, obj);
-                        reader.doThen(ctx, obj, name -> name.charAt(name.length() - 1) == '$');
+                        reader.doThen(ctx, obj, PRE_EXP_FILTER);
                         break;
                     }
                 }
             }
 
             if (reader != null && !reader.isSkip(ctx, obj)) {
-                reader.doThen(ctx, obj, name -> !(name.charAt(0) == '$' || name.charAt(name.length() - 1) == '$'));
+                reader.doThen(ctx, obj, EXP_FILTER);
 
                 if (!iterator.hasNext()) {
-                    reader.doThen(ctx, obj, name -> name.charAt(0) == '$');
+                    reader.doThen(ctx, obj, POST_EXP_FILTER);
                 }
 
                 if (!reader.getTake().isEmpty()) {
@@ -102,9 +114,9 @@ public class WtslExcelParser implements WtslParser {
             final String name = writer.getKey();
             final Expression exp = writer.getValue();
 
-            if (exp.getExpressionString().matches("^\\s?forEach\\([\\s\\S]+\\)\\s?$")) {
+            if (FOR_EACH_FILTER.matcher(exp.getExpressionString()).matches()) {
                 stream = stream.flatMap(ctx -> stream(value(name, exp, ctx, obj)).map(val -> ctx.next(name, val)));
-            } else if (exp.getExpressionString().matches("^\\s?removeIf\\([\\s\\S]+\\)\\s?$")) {
+            } else if (REMOVE_IF_FILTER.matcher(exp.getExpressionString()).matches()) {
                 stream = stream.filter(ctx -> !TRUE.equals(value(name, exp, ctx, obj)));
             } else {
                 stream = stream.map(ctx -> ctx.same(name, value(name, exp, ctx, obj)));
