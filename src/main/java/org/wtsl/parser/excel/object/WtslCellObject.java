@@ -16,12 +16,13 @@
 
 package org.wtsl.parser.excel.object;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,9 +40,12 @@ public class WtslCellObject extends WtslRowObject {
 
     private final Cell cell;
 
+    private final List<WtslPartObject> parts;
+
     public WtslCellObject(Map<String, ?> entries, Cell cell) {
         super(entries, cell.getRow());
         this.cell = cell;
+        this.parts = new ArrayList<>();
     }
 
     public final Cell getCell() {
@@ -62,22 +66,61 @@ public class WtslCellObject extends WtslRowObject {
 
     @Override
     public int size() {
+        return all().size();
+    }
+
+    @Override
+    public WtslPartObject get(int index) {
+        return all().get(index);
+    }
+
+    @Override
+    public WtslPartObject get(String key) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public WtslCellObject get(int index) {
-        throw new UnsupportedOperationException();
+    public List<WtslPartObject> all(int limit) {
+        return all().subList(0, limit);
     }
 
     @Override
-    public WtslCellObject get(String key) {
-        throw new UnsupportedOperationException();
-    }
+    public List<WtslPartObject> all() {
+        if (parts.isEmpty()) {
+            if (getCell().getCellType() == CellType.STRING) {
+                RichTextString rts = getCell().getRichStringCellValue();
+                String value = rts.getString();
 
-    @Override
-    public Iterable<WtslCellObject> all(int limit) {
-        throw new UnsupportedOperationException();
+                boolean hssf = rts instanceof HSSFRichTextString;
+
+                for (int i = 0; i < rts.numFormattingRuns(); i++) {
+                    int start = rts.getIndexOfFormattingRun(i);
+                    if (parts.isEmpty() && start > 0) {
+                        parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), value.substring(0, start)));
+                    }
+
+                    Font font;
+                    if (hssf) {
+                        font = getBook().getFontAt(((HSSFRichTextString) rts).getFontOfFormattingRun(i));
+                    } else {
+                        font = ((XSSFRichTextString) rts).getFontOfFormattingRun(i);
+                    }
+
+                    if (font == null) {
+                        font = getFont();
+                    }
+
+                    parts.add(new WtslPartObject(getEntries(), getCell(), font, i + 1 < rts.numFormattingRuns()
+                            ? value.substring(start, rts.getIndexOfFormattingRun(i + 1)) : value.substring(start)));
+                }
+            }
+
+            if (parts.isEmpty()) {
+                parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), getValue()));
+            }
+        }
+
+        return parts;
     }
 
     @Override
