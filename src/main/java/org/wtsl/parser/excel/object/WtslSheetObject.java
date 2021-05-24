@@ -18,14 +18,19 @@ package org.wtsl.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetVisibility;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.wtsl.parser.WtslUtils;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
 public class WtslSheetObject extends WtslBookObject {
+
+    private static final Map<String, List<CellRangeAddress>> RANGE_CACHE = new HashMap<>();
 
     private final Sheet sheet;
 
@@ -94,6 +99,10 @@ public class WtslSheetObject extends WtslBookObject {
 
     public boolean isProtected() {
         return isSheetProtected();
+    }
+
+    public List<CellRangeAddress> getRanges() {
+        return RANGE_CACHE.computeIfAbsent(getSheetName(), key -> getSheet().getMergedRegions());
     }
 
     @Override

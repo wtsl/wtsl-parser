@@ -18,6 +18,7 @@ package org.wtsl.parser.excel.object;
 
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
@@ -80,12 +81,12 @@ public class WtslCellObject extends WtslRowObject {
     }
 
     @Override
-    public List<WtslPartObject> all(int limit) {
+    public List<? extends WtslPartObject> all(int limit) {
         return all().subList(0, limit);
     }
 
     @Override
-    public List<WtslPartObject> all() {
+    public List<? extends WtslPartObject> all() {
         if (parts.isEmpty()) {
             if (getCell().getCellType() == CellType.STRING) {
                 RichTextString rts = getCell().getRichStringCellValue();
@@ -144,6 +145,19 @@ public class WtslCellObject extends WtslRowObject {
 
     public Font getFont() {
         return getBook().getFontAt(getStyle().getFontIndex());
+    }
+
+    public CellRangeAddress getRange() {
+        int rowNum = getRowNum();
+        int colNum = getColNum();
+
+        for (CellRangeAddress range : getRanges()) {
+            if (range.isInRange(rowNum, colNum)) {
+                return range;
+            }
+        }
+
+        return new CellRangeAddress(rowNum, rowNum, colNum, colNum);
     }
 
     public CellStyle getStyle() {

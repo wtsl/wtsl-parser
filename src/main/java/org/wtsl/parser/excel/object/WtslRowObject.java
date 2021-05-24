@@ -16,16 +16,21 @@
 
 package org.wtsl.parser.excel.object;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.wtsl.parser.WtslUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.CREATE_NULL_AS_BLANK;
+import static org.apache.poi.ss.usermodel.Row.MissingCellPolicy.RETURN_NULL_AND_BLANK;
 
 /**
  * @author Vadim Kolesnikov
@@ -82,6 +87,29 @@ public class WtslRowObject extends WtslSheetObject {
         return WtslUtils.iterator(limit, getRow(), cell -> new WtslCellObject(getEntries(), cell));
     }
 
+    public Iterable<? extends WtslCellObject> all(int from, int to) {
+        return all(from, to, Function.identity());
+    }
+
+    public Iterable<? extends WtslCellObject> all(CellRangeAddress range) {
+        return all(range, Function.identity());
+    }
+
+    private <T> Iterable<T> all(int from, int to, Function<WtslCellObject, T> function) {
+        List<T> objects = new ArrayList<>();
+        for (int i = from; i <= to; i++) {
+            Cell cell = getRow().getCell(i, RETURN_NULL_AND_BLANK);
+            if (cell != null) {
+                objects.add(function.apply(new WtslCellObject(getEntries(), cell)));
+            }
+        }
+        return objects;
+    }
+
+    private <T> Iterable<T> all(CellRangeAddress range, Function<WtslCellObject, T> function) {
+        return all(range.getFirstColumn(), range.getLastColumn(), function);
+    }
+
     @Override
     public String getName() {
         return getRowName();
@@ -115,6 +143,14 @@ public class WtslRowObject extends WtslSheetObject {
         return get(key).getFont();
     }
 
+    public Object range(int index) {
+        return get(index).getRange();
+    }
+
+    public Object range(String key) {
+        return get(key).getRange();
+    }
+
     public Object style(int index) {
         return get(index).getStyle();
     }
@@ -129,6 +165,14 @@ public class WtslRowObject extends WtslSheetObject {
 
     public Object value(String key) {
         return get(key).getValue();
+    }
+
+    public Object values(int from, int to) {
+        return all(from, to, WtslCellObject::getValue);
+    }
+
+    public Object values(CellRangeAddress range) {
+        return all(range, WtslCellObject::getValue);
     }
 
     public Object visible(int index) {
