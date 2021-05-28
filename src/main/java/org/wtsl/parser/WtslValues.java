@@ -16,24 +16,40 @@
 
 package org.wtsl.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Vadim Kolesnikov
  */
-public interface WtslValues {
+public interface WtslValues<T extends WtslValues<T>> extends Iterable<T> {
+
+    T get(int index);
+
+    T get(String key);
 
     int size();
 
-    default boolean isEmpty() {
-        return size() == 0;
+    default List<T> all(int limit) {
+        List<T> objects = new ArrayList<>(limit);
+        for (T object : this) {
+            if (limit <= objects.size()) {
+                break;
+            }
+            objects.add(object);
+        }
+        return objects;
     }
 
-    Object get(int index);
+    default List<T> all() {
+        List<T> objects = new ArrayList<>(size());
+        for (T object : this) {
+            objects.add(object);
+        }
+        return objects;
+    }
 
-    Object get(String key);
-
-    Iterable<?> all(int limit);
-
-    default Iterable<?> all() {
-        return all(Integer.MAX_VALUE);
+    default boolean isEmpty() {
+        return size() == 0;
     }
 }

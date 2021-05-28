@@ -21,8 +21,11 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.wtsl.parser.WtslUtils;
+import org.wtsl.parser.excel.WtslExcelValues;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -37,17 +40,17 @@ public class WtslCellObject extends WtslRowObject {
     private static final Map<Integer, String> NAME_CACHE = IntStream.range(0, 100).boxed().collect
             (Collectors.toMap(Function.identity(), CellReference::convertNumToColString));
 
-    private static final Object UNKNOWN_TYPE = new Object();
-
     private final Cell cell;
 
-    private final List<WtslPartObject> parts;
+    private final List<WtslExcelValues> parts;
 
     public WtslCellObject(Map<String, ?> entries, Cell cell) {
         super(entries, cell.getRow());
         this.cell = cell;
         this.parts = new ArrayList<>();
     }
+
+    // refined properties
 
     public final Cell getCell() {
         return cell;
@@ -65,64 +68,7 @@ public class WtslCellObject extends WtslRowObject {
         return !getSheet().isColumnHidden(getCell().getColumnIndex());
     }
 
-    @Override
-    public int size() {
-        return all().size();
-    }
-
-    @Override
-    public WtslPartObject get(int index) {
-        return all().get(index);
-    }
-
-    @Override
-    public WtslPartObject get(String key) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<? extends WtslPartObject> all(int limit) {
-        return all().subList(0, limit);
-    }
-
-    @Override
-    public List<? extends WtslPartObject> all() {
-        if (parts.isEmpty()) {
-            if (getCell().getCellType() == CellType.STRING) {
-                RichTextString rts = getCell().getRichStringCellValue();
-                String value = rts.getString();
-
-                boolean hssf = rts instanceof HSSFRichTextString;
-
-                for (int i = 0; i < rts.numFormattingRuns(); i++) {
-                    int start = rts.getIndexOfFormattingRun(i);
-                    if (parts.isEmpty() && start > 0) {
-                        parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), value.substring(0, start)));
-                    }
-
-                    Font font;
-                    if (hssf) {
-                        font = getBook().getFontAt(((HSSFRichTextString) rts).getFontOfFormattingRun(i));
-                    } else {
-                        font = ((XSSFRichTextString) rts).getFontOfFormattingRun(i);
-                    }
-
-                    if (font == null) {
-                        font = getFont();
-                    }
-
-                    parts.add(new WtslPartObject(getEntries(), getCell(), font, i + 1 < rts.numFormattingRuns()
-                            ? value.substring(start, rts.getIndexOfFormattingRun(i + 1)) : value.substring(start)));
-                }
-            }
-
-            if (parts.isEmpty()) {
-                parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), getValue()));
-            }
-        }
-
-        return parts;
-    }
+    // common properties
 
     @Override
     public String getName() {
@@ -165,23 +111,83 @@ public class WtslCellObject extends WtslRowObject {
     }
 
     public Object getValue() {
-        switch (getCell().getCellType()) {
-            case ERROR:
-                return getCell().getErrorCellValue();
-            case BLANK:
-            case STRING:
-            case FORMULA:
-                return getCell().getStringCellValue();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(getCell())) {
-                    return getCell().getLocalDateTimeCellValue();
+        return WtslUtils.value(getCell());
+    }
+
+    // interface properties
+
+    @Override
+    public List<WtslExcelValues> all() {
+        if (parts.isEmpty()) {
+            if (getCell().getCellType() == CellType.STRING) {
+                RichTextString rts = getCell().getRichStringCellValue();
+                String value = rts.getString();
+
+                boolean hssf = rts instanceof HSSFRichTextString;
+
+                for (int i = 0; i < rts.numFormattingRuns(); i++) {
+                    int start = rts.getIndexOfFormattingRun(i);
+                    if (parts.isEmpty() && start > 0) {
+                        parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), value.substring(0, start)));
+                    }
+
+                    Font font;
+                    if (hssf) {
+                        font = getBook().getFontAt(((HSSFRichTextString) rts).getFontOfFormattingRun(i));
+                    } else {
+                        font = ((XSSFRichTextString) rts).getFontOfFormattingRun(i);
+                    }
+
+                    if (font == null) {
+                        font = getFont();
+                    }
+
+                    parts.add(new WtslPartObject(getEntries(), getCell(), font, i + 1 < rts.numFormattingRuns()
+                            ? value.substring(start, rts.getIndexOfFormattingRun(i + 1)) : value.substring(start)));
                 }
-                return getCell().getNumericCellValue();
-            case BOOLEAN:
-                return getCell().getBooleanCellValue();
-            default:
-                return UNKNOWN_TYPE;
+            }
+
+            if (parts.isEmpty()) {
+                parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), getValue()));
+            }
         }
+
+        return parts;
+    }
+
+    @Override
+    public List<WtslExcelValues> all(int limit) {
+        return all().subList(0, limit + 1);
+    }
+
+    @Override
+    public List<WtslExcelValues> all(int from, int to) {
+        return all().subList(from, to + 1);
+    }
+
+    @Override
+    public List<WtslExcelValues> all(CellRangeAddress range) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public WtslPartObject get(int index) {
+        return (WtslPartObject) all().get(index);
+    }
+
+    @Override
+    public WtslPartObject get(String key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Iterator<WtslExcelValues> iterator() {
+        return all().iterator();
+    }
+
+    @Override
+    public int size() {
+        return all().size();
     }
 
     @Override

@@ -14,42 +14,39 @@
  * limitations under the License.
  */
 
-package org.wtsl.parser.excel.object;
+package org.wtsl.parser.excel;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Font;
-import org.wtsl.parser.excel.WtslExcelValues;
+import org.wtsl.parser.WtslValues;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslPartObject extends WtslCellObject {
+public class WtslExcelValues extends WtslExcelObject implements WtslValues<WtslExcelValues> {
 
-    private final Font font;
-
-    private final Object value;
-
-    public WtslPartObject(Map<String, ?> entries, Cell cell, Font font, Object value) {
-        super(entries, cell);
-        this.font = font;
-        this.value = value;
+    public WtslExcelValues(Map<String, ?> entries) {
+        super(entries);
     }
 
     @Override
-    public Font getFont() {
-        return font;
+    public WtslExcelValues get(int index) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getValue() {
-        return value;
+    public WtslExcelValues get(String key) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<WtslExcelValues> all() {
+    public int size() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Iterator<WtslExcelValues> iterator() {
         throw new UnsupportedOperationException();
     }
 }

@@ -16,13 +16,18 @@
 
 package org.wtsl.parser;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelCompilerMode;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -30,6 +35,8 @@ import java.util.stream.Stream;
  * @author Vadim Kolesnikov
  */
 public class WtslUtils {
+
+    private static final Object UNKNOWN_TYPE = new Object();
 
     private static final String ERROR_FORMAT = "key = %s\n\n%s\n";
 
@@ -88,26 +95,40 @@ public class WtslUtils {
         return Stream.of(object);
     }
 
-    public static <T, R> Iterable<R> iterator(int limit, Iterable<T> iterable, Function<T, R> function) {
-        return () -> new Iterator<R>() {
+    public static <T, R> Iterator<R> iterator(Iterable<T> iterable, Function<T, R> function) {
+        return new Iterator<R>() {
 
             final Iterator<T> iterator = iterable.iterator();
 
-            int count = 0;
-
             @Override
             public boolean hasNext() {
-                return count < limit && iterator.hasNext();
+                return iterator.hasNext();
             }
 
             @Override
             public R next() {
-                if (hasNext()) {
-                    count++;
-                    return function.apply(iterator.next());
-                }
-                throw new NoSuchElementException();
+                return function.apply(iterator.next());
             }
         };
+    }
+
+    public static Object value(Cell cell) {
+        switch (cell.getCellType()) {
+            case ERROR:
+                return cell.getErrorCellValue();
+            case BLANK:
+            case STRING:
+            case FORMULA:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getLocalDateTimeCellValue();
+                }
+                return cell.getNumericCellValue();
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            default:
+                return UNKNOWN_TYPE;
+        }
     }
 }

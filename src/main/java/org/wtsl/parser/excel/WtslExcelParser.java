@@ -16,12 +16,11 @@
 
 package org.wtsl.parser.excel;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.expression.Expression;
 import org.wtsl.parser.*;
-import org.wtsl.parser.excel.object.WtslCellObject;
-import org.wtsl.parser.excel.object.WtslRowObject;
-import org.wtsl.parser.excel.object.WtslSheetObject;
+import org.wtsl.parser.excel.object.WtslBookObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +55,7 @@ public class WtslExcelParser implements WtslParser {
         Map<String, Object> entries = new LinkedHashMap<>(schema.getEntries());
         try (Workbook workbook = WorkbookFactory.create(stream)) {
             if (!schema.getReaders().isEmpty()) {
-                read(metadata, entries, schema.getReaders(), workbook, 1);
+                read(metadata, schema.getReaders(), new WtslBookObject(entries, workbook));
             }
             return write(metadata, entries, schema.getWriters());
         } catch (IOException ex) {
@@ -64,14 +63,13 @@ public class WtslExcelParser implements WtslParser {
         }
     }
 
-    private void read(Map<String, Object> metadata, Map<String, Object> entries, List<WtslReader> readers, Iterable<?> element, int lvl) {
+    private void read(Map<String, Object> metadata, List<WtslReader> readers, WtslExcelValues object) {
         WtslContext ctx = new WtslContext();
         WtslReader reader = null;
 
-        Iterator<?> iterator = element.iterator();
+        Iterator<WtslExcelValues> iterator = object.iterator();
         while (iterator.hasNext()) {
-            Object node = iterator.next();
-            WtslObject obj = build(entries, node, lvl);
+            WtslExcelValues obj = iterator.next();
 
             if (reader != null && reader.isTill(ctx, obj)) {
                 reader.doThen(ctx, obj, THEN_FILTER_POST);
@@ -94,12 +92,13 @@ public class WtslExcelParser implements WtslParser {
             if (reader != null && !reader.isSkip(ctx, obj)) {
                 reader.doThen(ctx, obj, THEN_FILTER);
 
-                if (!iterator.hasNext()) {
-                    reader.doThen(ctx, obj, THEN_FILTER_POST);
+                if (!reader.getTake().isEmpty()) {
+                    read(metadata, reader.getTake(), obj);
                 }
 
-                if (!reader.getTake().isEmpty()) {
-                    read(metadata, entries, reader.getTake(), (Iterable<?>) node, lvl + 1);
+                if (!iterator.hasNext()) {
+                    reader.doThen(ctx, obj, THEN_FILTER_POST);
+                    reader = null;
                 }
             }
         }
@@ -124,18 +123,5 @@ public class WtslExcelParser implements WtslParser {
         }
 
         return stream.map(WtslContext::getVariables).collect(Collectors.toCollection(LinkedList::new));
-    }
-
-    private WtslObject build(Map<String, Object> entries, Object node, int lvl) {
-        switch (lvl) {
-            case 1:
-                return new WtslSheetObject(entries, (Sheet) node);
-            case 2:
-                return new WtslRowObject(entries, (Row) node);
-            case 3:
-                return new WtslCellObject(entries, (Cell) node);
-            default:
-                throw new UnsupportedOperationException();
-        }
     }
 }

@@ -18,15 +18,15 @@ package org.wtsl.parser.excel.object;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.wtsl.parser.WtslUtils;
-import org.wtsl.parser.WtslValues;
-import org.wtsl.parser.excel.WtslExcelObject;
+import org.wtsl.parser.excel.WtslExcelValues;
 
+import java.util.Iterator;
 import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
  */
-public class WtslBookObject extends WtslExcelObject implements WtslValues {
+public class WtslBookObject extends WtslExcelValues {
 
     private final Workbook book;
 
@@ -34,6 +34,8 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
         super(entries);
         this.book = book;
     }
+
+    // refined properties
 
     public final Workbook getBook() {
         return book;
@@ -51,10 +53,17 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
         return getBook().getSpreadsheetVersion().name();
     }
 
-    @Override
-    public int size() {
-        return getBookSize();
+    // common properties
+
+    public String getName() {
+        return getBookVersion();
     }
+
+    public boolean isVisible() {
+        return isBookVisible();
+    }
+
+    // interface properties
 
     @Override
     public WtslSheetObject get(int index) {
@@ -67,16 +76,13 @@ public class WtslBookObject extends WtslExcelObject implements WtslValues {
     }
 
     @Override
-    public Iterable<? extends WtslSheetObject> all(int limit) {
-        return WtslUtils.iterator(limit, getBook(), sheet -> new WtslSheetObject(getEntries(), sheet));
+    public Iterator<WtslExcelValues> iterator() {
+        return WtslUtils.iterator(getBook(), sheet -> new WtslSheetObject(getEntries(), sheet));
     }
 
-    public String getName() {
-        return getBookVersion();
-    }
-
-    public boolean isVisible() {
-        return isBookVisible();
+    @Override
+    public int size() {
+        return getBookSize();
     }
 
     @Override

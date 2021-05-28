@@ -16,14 +16,14 @@
 
 package org.wtsl.parser.excel.object;
 
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.SheetVisibility;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.wtsl.parser.WtslUtils;
+import org.wtsl.parser.excel.WtslExcelValues;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Vadim Kolesnikov
@@ -38,6 +38,8 @@ public class WtslSheetObject extends WtslBookObject {
         super(entries, sheet.getWorkbook());
         this.sheet = sheet;
     }
+
+    // refined properties
 
     public final Sheet getSheet() {
         return sheet;
@@ -63,9 +65,45 @@ public class WtslSheetObject extends WtslBookObject {
         return getSheet().getProtect();
     }
 
+    // common properties
+
     @Override
-    public int size() {
-        return getSheetSize();
+    public String getName() {
+        return getSheetName();
+    }
+
+    @Override
+    public boolean isVisible() {
+        return isSheetVisible();
+    }
+
+    public int getNumber() {
+        return getSheetNum();
+    }
+
+    public boolean isProtected() {
+        return isSheetProtected();
+    }
+
+    public List<CellRangeAddress> getRanges() {
+        return RANGE_CACHE.computeIfAbsent(getSheetName(), key -> getSheet().getMergedRegions());
+    }
+
+    // interface properties
+
+    public List<WtslExcelValues> all(int from, int to) {
+        List<WtslExcelValues> objects = new ArrayList<>(to - from + 1);
+        for (int i = from; i <= to; i++) {
+            Row row = getSheet().getRow(i);
+            if (row != null) {
+                objects.add(new WtslRowObject(getEntries(), row));
+            }
+        }
+        return objects;
+    }
+
+    public List<WtslExcelValues> all(CellRangeAddress range) {
+        return all(range.getFirstRow(), range.getLastRow());
     }
 
     @Override
@@ -79,30 +117,13 @@ public class WtslSheetObject extends WtslBookObject {
     }
 
     @Override
-    public Iterable<? extends WtslRowObject> all(int limit) {
-        return WtslUtils.iterator(limit, getSheet(), row -> new WtslRowObject(getEntries(), row));
+    public Iterator<WtslExcelValues> iterator() {
+        return WtslUtils.iterator(getSheet(), row -> new WtslRowObject(getEntries(), row));
     }
 
     @Override
-    public String getName() {
-        return getSheetName();
-    }
-
-    public int getNumber() {
-        return getSheetNum();
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isSheetVisible();
-    }
-
-    public boolean isProtected() {
-        return isSheetProtected();
-    }
-
-    public List<CellRangeAddress> getRanges() {
-        return RANGE_CACHE.computeIfAbsent(getSheetName(), key -> getSheet().getMergedRegions());
+    public int size() {
+        return getSheetSize();
     }
 
     @Override
