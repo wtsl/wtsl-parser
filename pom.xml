@@ -6,7 +6,7 @@
 
     <groupId>org.wtsl</groupId>
     <artifactId>wtsl-parser</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
 
     <name>WTSL Parser</name>
