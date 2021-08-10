@@ -118,8 +118,9 @@ public class WtslUtils {
                 return cell.getErrorCellValue();
             case BLANK:
             case STRING:
-            case FORMULA:
                 return cell.getStringCellValue();
+            case FORMULA:
+                return cell.getCellFormula();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getLocalDateTimeCellValue();
