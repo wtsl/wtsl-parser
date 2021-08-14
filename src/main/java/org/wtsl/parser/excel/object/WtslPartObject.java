@@ -16,12 +16,10 @@
 
 package org.wtsl.parser.excel.object;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Font;
 import org.wtsl.parser.excel.WtslExcelValues;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Vadim Kolesnikov
@@ -32,8 +30,8 @@ public class WtslPartObject extends WtslCellObject {
 
     private final Object value;
 
-    public WtslPartObject(Map<String, ?> entries, Cell cell, Font font, Object value) {
-        super(entries, cell);
+    public WtslPartObject(WtslCellObject parent, Font font, Object value) {
+        super(parent);
         this.font = font;
         this.value = value;
     }

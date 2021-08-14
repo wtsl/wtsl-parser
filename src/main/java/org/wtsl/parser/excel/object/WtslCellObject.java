@@ -17,7 +17,11 @@
 package org.wtsl.parser.excel.object;
 
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
@@ -44,10 +48,16 @@ public class WtslCellObject extends WtslRowObject {
 
     private final List<WtslExcelValues> parts;
 
-    public WtslCellObject(Map<String, ?> entries, Cell cell) {
-        super(entries, cell.getRow());
+    public WtslCellObject(WtslRowObject parent, Cell cell) {
+        super(parent);
         this.cell = cell;
         this.parts = new ArrayList<>();
+    }
+
+    WtslCellObject(WtslCellObject parent) {
+        super(parent);
+        this.cell = parent.cell;
+        this.parts = parent.parts;
     }
 
     // refined properties
@@ -111,7 +121,7 @@ public class WtslCellObject extends WtslRowObject {
     }
 
     public Object getValue() {
-        return WtslUtils.value(getCell());
+        return WtslUtils.value(getCell(), getEval());
     }
 
     // interface properties
@@ -128,7 +138,7 @@ public class WtslCellObject extends WtslRowObject {
                 for (int i = 0; i < rts.numFormattingRuns(); i++) {
                     int start = rts.getIndexOfFormattingRun(i);
                     if (parts.isEmpty() && start > 0) {
-                        parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), value.substring(0, start)));
+                        parts.add(new WtslPartObject(this, getFont(), value.substring(0, start)));
                     }
 
                     Font font;
@@ -142,13 +152,13 @@ public class WtslCellObject extends WtslRowObject {
                         font = getFont();
                     }
 
-                    parts.add(new WtslPartObject(getEntries(), getCell(), font, i + 1 < rts.numFormattingRuns()
+                    parts.add(new WtslPartObject(this, font, i + 1 < rts.numFormattingRuns()
                             ? value.substring(start, rts.getIndexOfFormattingRun(i + 1)) : value.substring(start)));
                 }
             }
 
             if (parts.isEmpty()) {
-                parts.add(new WtslPartObject(getEntries(), getCell(), getFont(), getValue()));
+                parts.add(new WtslPartObject(this, getFont(), getValue()));
             }
         }
 

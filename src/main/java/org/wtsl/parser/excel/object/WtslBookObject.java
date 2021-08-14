@@ -16,6 +16,7 @@
 
 package org.wtsl.parser.excel.object;
 
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.wtsl.parser.WtslUtils;
 import org.wtsl.parser.excel.WtslExcelValues;
@@ -30,15 +31,28 @@ public class WtslBookObject extends WtslExcelValues {
 
     private final Workbook book;
 
+    private final FormulaEvaluator eval;
+
     public WtslBookObject(Map<String, ?> entries, Workbook book) {
         super(entries);
         this.book = book;
+        this.eval = book.getCreationHelper().createFormulaEvaluator();
+    }
+
+    WtslBookObject(WtslBookObject parent) {
+        super(parent.getEntries());
+        this.book = parent.book;
+        this.eval = parent.eval;
     }
 
     // refined properties
 
     public final Workbook getBook() {
         return book;
+    }
+
+    public FormulaEvaluator getEval() {
+        return eval;
     }
 
     public final int getBookSize() {
@@ -67,17 +81,17 @@ public class WtslBookObject extends WtslExcelValues {
 
     @Override
     public WtslSheetObject get(int index) {
-        return new WtslSheetObject(getEntries(), getBook().getSheetAt(index));
+        return new WtslSheetObject(this, getBook().getSheetAt(index));
     }
 
     @Override
     public WtslSheetObject get(String key) {
-        return new WtslSheetObject(getEntries(), getBook().getSheet(key));
+        return new WtslSheetObject(this, getBook().getSheet(key));
     }
 
     @Override
     public Iterator<WtslExcelValues> iterator() {
-        return WtslUtils.iterator(getBook(), sheet -> new WtslSheetObject(getEntries(), sheet));
+        return WtslUtils.iterator(getBook(), sheet -> new WtslSheetObject(this, sheet));
     }
 
     @Override

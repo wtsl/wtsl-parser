@@ -44,9 +44,14 @@ public class WtslRowObject extends WtslSheetObject {
 
     private final Row row;
 
-    public WtslRowObject(Map<String, ?> entries, Row row) {
-        super(entries, row.getSheet());
+    public WtslRowObject(WtslSheetObject parent, Row row) {
+        super(parent);
         this.row = row;
+    }
+
+    WtslRowObject(WtslRowObject parent) {
+        super(parent);
+        this.row = parent.row;
     }
 
     // refined properties
@@ -96,7 +101,7 @@ public class WtslRowObject extends WtslSheetObject {
         for (int i = from; i <= to; i++) {
             Cell cell = getRow().getCell(i, RETURN_NULL_AND_BLANK);
             if (cell != null) {
-                objects.add(new WtslCellObject(getEntries(), cell));
+                objects.add(new WtslCellObject(this, cell));
             }
         }
         return objects;
@@ -109,7 +114,7 @@ public class WtslRowObject extends WtslSheetObject {
 
     @Override
     public WtslCellObject get(int index) {
-        return new WtslCellObject(getEntries(), getRow().getCell(index, CREATE_NULL_AS_BLANK));
+        return new WtslCellObject(this, getRow().getCell(index, CREATE_NULL_AS_BLANK));
     }
 
     @Override
@@ -119,7 +124,7 @@ public class WtslRowObject extends WtslSheetObject {
 
     @Override
     public Iterator<WtslExcelValues> iterator() {
-        return WtslUtils.iterator(getRow(), cell -> new WtslCellObject(getEntries(), cell));
+        return WtslUtils.iterator(getRow(), cell -> new WtslCellObject(this, cell));
     }
 
     @Override
@@ -177,7 +182,7 @@ public class WtslRowObject extends WtslSheetObject {
     public Object values() {
         List<Object> objects = new ArrayList<>();
         for (Cell cell : getRow()) {
-            objects.add(WtslUtils.value(cell));
+            objects.add(WtslUtils.value(cell, getEval()));
         }
         return objects;
     }
@@ -187,7 +192,7 @@ public class WtslRowObject extends WtslSheetObject {
         for (int i = from; i <= to; i++) {
             Cell cell = getRow().getCell(i, RETURN_NULL_AND_BLANK);
             if (cell != null) {
-                objects.add(WtslUtils.value(cell));
+                objects.add(WtslUtils.value(cell, getEval()));
             }
         }
         return objects;

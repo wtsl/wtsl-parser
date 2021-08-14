@@ -17,7 +17,9 @@
 package org.wtsl.parser;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelCompilerMode;
@@ -35,8 +37,6 @@ import java.util.stream.Stream;
  * @author Vadim Kolesnikov
  */
 public class WtslUtils {
-
-    private static final Object UNKNOWN_TYPE = new Object();
 
     private static final String ERROR_FORMAT = "key = %s\n\n%s\n";
 
@@ -112,24 +112,32 @@ public class WtslUtils {
         };
     }
 
-    public static Object value(Cell cell) {
-        switch (cell.getCellType()) {
+    public static Object value(Cell cell, FormulaEvaluator eval) {
+        return value(cell, eval.evaluateFormulaCell(cell));
+    }
+
+    private static Object value(Cell cell, CellType type) {
+        switch (type) {
             case ERROR:
                 return cell.getErrorCellValue();
             case BLANK:
             case STRING:
                 return cell.getStringCellValue();
-            case FORMULA:
-                return cell.getCellFormula();
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getLocalDateTimeCellValue();
                 }
                 return cell.getNumericCellValue();
-            case BOOLEAN:
-                return cell.getBooleanCellValue();
+            case _NONE:
+                type = cell.getCellType();
+                if (type != CellType._NONE) {
+                    return value(cell, type);
+                }
+            case FORMULA:
             default:
-                return UNKNOWN_TYPE;
+                throw new IllegalStateException();
         }
     }
 }

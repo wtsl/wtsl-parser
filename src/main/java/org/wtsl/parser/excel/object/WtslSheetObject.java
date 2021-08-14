@@ -23,26 +23,39 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.wtsl.parser.WtslUtils;
 import org.wtsl.parser.excel.WtslExcelValues;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Vadim Kolesnikov
  */
 public class WtslSheetObject extends WtslBookObject {
 
-    private static final Map<String, List<CellRangeAddress>> RANGE_CACHE = new HashMap<>();
-
     private final Sheet sheet;
 
-    public WtslSheetObject(Map<String, ?> entries, Sheet sheet) {
-        super(entries, sheet.getWorkbook());
+    private final List<CellRangeAddress> ranges;
+
+    public WtslSheetObject(WtslBookObject parent, Sheet sheet) {
+        super(parent);
         this.sheet = sheet;
+        this.ranges = sheet.getMergedRegions();
+    }
+
+    WtslSheetObject(WtslSheetObject parent) {
+        super(parent);
+        this.sheet = parent.sheet;
+        this.ranges = parent.ranges;
     }
 
     // refined properties
 
     public final Sheet getSheet() {
         return sheet;
+    }
+
+    public List<CellRangeAddress> getRanges() {
+        return ranges;
     }
 
     public final int getSheetNum() {
@@ -85,10 +98,6 @@ public class WtslSheetObject extends WtslBookObject {
         return isSheetProtected();
     }
 
-    public List<CellRangeAddress> getRanges() {
-        return RANGE_CACHE.computeIfAbsent(getSheetName(), key -> getSheet().getMergedRegions());
-    }
-
     // interface properties
 
     public List<WtslExcelValues> all(int from, int to) {
@@ -96,7 +105,7 @@ public class WtslSheetObject extends WtslBookObject {
         for (int i = from; i <= to; i++) {
             Row row = getSheet().getRow(i);
             if (row != null) {
-                objects.add(new WtslRowObject(getEntries(), row));
+                objects.add(new WtslRowObject(this, row));
             }
         }
         return objects;
@@ -108,7 +117,7 @@ public class WtslSheetObject extends WtslBookObject {
 
     @Override
     public WtslRowObject get(int index) {
-        return new WtslRowObject(getEntries(), getSheet().getRow(index));
+        return new WtslRowObject(this, getSheet().getRow(index));
     }
 
     @Override
@@ -118,7 +127,7 @@ public class WtslSheetObject extends WtslBookObject {
 
     @Override
     public Iterator<WtslExcelValues> iterator() {
-        return WtslUtils.iterator(getSheet(), row -> new WtslRowObject(getEntries(), row));
+        return WtslUtils.iterator(getSheet(), row -> new WtslRowObject(this, row));
     }
 
     @Override
