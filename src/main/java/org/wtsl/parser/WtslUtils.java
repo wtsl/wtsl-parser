@@ -129,6 +129,8 @@ public class WtslUtils {
                 return cell.getStringCellValue();
             case BOOLEAN:
                 return cell.getBooleanCellValue();
+            case FORMULA:
+                return cell.getCellFormula();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getLocalDateTimeCellValue();
@@ -138,7 +140,6 @@ public class WtslUtils {
                 if (cell.getCellType() != CellType._NONE) {
                     return value(cell);
                 }
-            case FORMULA:
             default:
                 throw new UnsupportedOperationException("Unsupported cell type: " + type);
         }
