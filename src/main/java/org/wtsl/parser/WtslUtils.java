@@ -112,11 +112,15 @@ public class WtslUtils {
         };
     }
 
+    public static Object value(Cell cell) {
+        return value(cell, cell.getCellType());
+    }
+
     public static Object value(Cell cell, FormulaEvaluator eval) {
         return value(cell, eval.evaluateFormulaCell(cell));
     }
 
-    private static Object value(Cell cell, CellType type) {
+    public static Object value(Cell cell, CellType type) {
         switch (type) {
             case ERROR:
                 return cell.getErrorCellValue();
@@ -131,13 +135,12 @@ public class WtslUtils {
                 }
                 return cell.getNumericCellValue();
             case _NONE:
-                type = cell.getCellType();
-                if (type != CellType._NONE) {
-                    return value(cell, type);
+                if (cell.getCellType() != CellType._NONE) {
+                    return value(cell);
                 }
             case FORMULA:
             default:
-                throw new IllegalStateException();
+                throw new UnsupportedOperationException("Unsupported cell type: " + type);
         }
     }
 }
